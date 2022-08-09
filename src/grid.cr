@@ -5,7 +5,7 @@ module Grid
   #
   # Example:
   # ```
-  # Grid.out("")
+  # Grid.get("")
   # ```
   def self.get(list : String)
     height, width = {38, 169}
