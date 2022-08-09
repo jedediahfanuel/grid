@@ -1,6 +1,6 @@
 # grid
 
-A minimal terminal grid output for crystal programming language
+A string grid formatter library for crystal programming language.
 
 ## Installation
 
