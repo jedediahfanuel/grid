@@ -1,6 +1,9 @@
 name: grid
 version: 0.1.0
 
+description: |
+  A minimal terminal grid output for crystal lang
+
 authors:
   - Jeddi212 <jedediahf51@gmail.com>
 
