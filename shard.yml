@@ -10,7 +10,3 @@ authors:
 crystal: 1.5.0
 
 license: MIT
-
-dependencies:
-  term-screen:
-    github: crystal-term/screen
