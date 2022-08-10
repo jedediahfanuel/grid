@@ -64,7 +64,7 @@ class Grid
           if @col_ptr >= 0
             rearrange(i, @col_ptr + 1)
           else
-            retres
+            flush
             return @canvas = [list]
           end
         end
@@ -78,7 +78,7 @@ class Grid
           if @col_ptr >= 0
             rearrange(i, @col_ptr + 1)
           else
-            retres
+            flush
             return @canvas = [list]
           end
         end
@@ -94,7 +94,7 @@ class Grid
   #   end
   # end
   
-  private def retres
+  private def flush
     @col_ptr = 0
     @col_width.clear
     @col_width << @list.max_by { |elm| elm.size }.size
