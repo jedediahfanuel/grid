@@ -24,7 +24,16 @@ TODO: Write usage instructions here
 
 ## Development
 
-TODO: Write development instructions here
+Work in progress
+- [ ] Custom header
+- [ ] Auto grid
+- [ ] Manual grid 
+
+      - [ col , row ] 
+      - [ col_width ]
+      - [ elipsis ]
+      - [ pass through ]
+      - [ direction ]
 
 ## Contributing
 
