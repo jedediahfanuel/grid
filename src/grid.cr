@@ -94,6 +94,17 @@ class Grid
   #   end
   # end
   
+  # Flush (reset) the data from these attribute
+  # ```
+  # @col_ptr
+  # @canvas
+  # ```
+  # 
+  # And set these attribute to the newly `one_column` method
+  # ```
+  # @col_width # => longest str in the list
+  # @row       # => current row height ( list.size )
+  # ```
   private def flush
     @col_ptr = 0
     @col_width.clear
