@@ -71,70 +71,6 @@ class Grid
     @list = str.strip.split
   end
   
-  # Generate grid output with *list* type of `Array(String)` as a input parameter.
-  #
-  # Example:
-  # ```
-  # Grid.get("").generate
-  # ```
-  def generate(max_w = 24)
-    @canvas.clear
-    @row_height.clear
-    @col_width.clear
-    @col_ptr = 0
-    @row = 0
-    @max_width = max_w
-    # return ArgumentError.new("Max width is invalid") if @max_width < 1
-    
-    # cek str size tambah cur size, kalau kelewatan, coba cek jika dihitung dari 
-    # col sebelumnya
-    # kalau masih belum bisa, cek lagi ke col sebelumnya,
-    # kalau sudah col [0], tambahin aja langsung
-    
-    # penambahannya, tambahin dulu semua elemen row pada kolom ini, baru str yg sekarang
-    # kalau misal ga jadi satu kolom (2, 3, dst)
-    # hitung panjang array sekarang
-    # terus bagi rata ke jumlah kolom
-    
-    # terus harus reset col_width masing-masing col
-    # terus hitung lagi masing-masing kolom berapa width nya
-    # jumlah row nya juga update
-    @list.each_with_index do |str, i|
-      return @canvas = [list] if str.size >= @max_width
-      
-      if @canvas.empty? || @canvas[-1].size >= row # empty canvas || the latest col is full -> make new col
-        if get_next_width(str) < @max_width        # if the new col of str.size is fit the max width size
-          @canvas << [str] of String               # just append it as the first element
-          @col_width << str.size
-        else                                       # if not fit, me must re arrange the canvas, -1 col
-          @col_ptr = check_col(str)
-          if @col_ptr >= 0
-            rearrange(i, @col_ptr + 1)
-          else
-            flush
-            return @canvas = [list]
-          end
-        end
-      else                                         # the last col has some space for the new str
-        if get_next_width(str) < @max_width        # if the new col of str.size is fit the max width size
-          @canvas[-1] << str                       # just append it to the last element
-          @col_width[-1] = str.size if str.size > @col_width[-1] # update the col_width if new str size is bigger
-          # @row += 1
-        else                                       # if not fit, me must re arrange the canvas, -1 col
-          @col_ptr = check_col(str)
-          if @col_ptr >= 0
-            rearrange(i, @col_ptr + 1)
-          else
-            flush
-            return @canvas = [list]
-          end
-        end
-      end
-    end
-    
-    @canvas
-  end
-  
   def virtual_generate(max_w = 24)
     @canvas.clear
     @row_height.clear
@@ -160,7 +96,7 @@ class Grid
     @list.each_with_index do |str, i|
       if str.size >= @max_width
         virtual_one_column
-        return virtual_to_canvas
+        return
       end
       
       if @row_height.empty? || @row_height.last >= highest_virtual_row # empty canvas || the latest col is full -> make new col
@@ -170,23 +106,21 @@ class Grid
         else                                       # if not fit, me must re arrange the canvas, -1 col
           unless virtual_rearrange(str, i)
             virtual_one_column
-            return virtual_to_canvas
+            return
           end
         end
       else                                         # the last col has some space for the new str
-        if get_next_width(str, 2) < @max_width        # if the new col of str.size is fit the max width size
+        if get_next_width(str, -2) < @max_width        # if the new col of str.size is fit the max width size
           @row_height[-1] += 1                     # just append it to the last element
           @col_width[-1] = str.size if str.size > @col_width[-1] # update the col_width if new str size is bigger
         else                                       # if not fit, me must re arrange the canvas, -1 col
           unless virtual_rearrange(str, i)
             virtual_one_column
-            return virtual_to_canvas
+            return
           end
         end
       end
     end
-    
-    virtual_to_canvas
   end
   
   def virtual_rearrange(str : String, str_index : Int32) : Bool
@@ -224,7 +158,7 @@ class Grid
     is_fit = -1
     
     (2..@col_width.size).each do |i|
-      if get_next_width(str, i) < @max_width
+      if get_next_width(str, -i) < @max_width
         break is_fit = @col_width.size - i
       end
     end
@@ -273,19 +207,6 @@ class Grid
     end
   end
   
-  # TODO : Check dengan geser satu-satu
-  private def check_col(str : String) : Int32
-    is_fit = -1
-    
-    (1..@col_width.size).each do |i|
-      if get_next_width(str, i) < @max_width
-        break is_fit = @col_width.size - i
-      end
-    end
-    
-    is_fit
-  end
-  
   # Count the delimiter of the whole column.
   # Example:
   # ```
@@ -302,10 +223,10 @@ class Grid
   # Example:
   # ```
   # ["a", "b", "c"]
-  # delimiter_count(2)  # => ["a", "b"]
+  # delimiter_count(1)  # => ["a", "b"]
   # ```
   private def delimiter_count(i : Int32) : Int32
-    col_size = @col_width[0..-i].size
+    col_size = @col_width[0..i].size
     col_size < 1 ? col_size : col_size - 1
   end
   
@@ -327,7 +248,7 @@ class Grid
   # # => (4 + 4 = 3) + 2 + 4
   # # => 17
   private def get_next_width(str : String, i : Int32) : Int32
-    @col_width[0..-i].sum(0) + delimiter_count(i) + str.size
+    @col_width[0..i].sum(0) + delimiter_count(i) + str.size
   end
   
   # Join the *list* with `'\n'` and convert it to the type of String
@@ -377,35 +298,17 @@ a = Grid.new("Rubys Crystals Emeralds Sapphires")
 b = Grid.new("Ruby Crystal Emerald Sapphire")
 c = Grid.new(["Java", "Lua", "C#", "Perl", "Kotlin", "ABAB", "Pascal", "Rust", "Zig", "C++", "C", "APL"])
 
-a.virtual_generate(18).each { |x| puts x }
+a.virtual_generate(18)
+a.virtual_to_canvas.each { |x| puts x }
 p ""
 p ""
 p ""
 p ""
-b.virtual_generate(20).each { |x| puts x }
+b.virtual_generate(20)
+b.virtual_to_canvas.each { |x| puts x }
 p ""
 p ""
 p ""
 p ""
-c.virtual_generate(40).each { |x| puts x }
-p ""
-p ""
-p ""
-p ""
-
-
-# _a = Grid.new("Rubys Crystals Emeralds Sapphires")
-# _b = Grid.new("Ruby Crystal Emerald Sapphire")
-# _c = Grid.new(["Java", "Lua", "C#", "Perl", "Kotlin", "ABAB", "Pascal", "Rust", "Zig", "C++", "C", "APL"])
-
-# _a.generate(20).each { |x| puts x }
-# p ""
-# p ""
-# p ""
-# p ""
-# _b.generate(20).each { |x| puts x }
-# p ""
-# p ""
-# p ""
-# p ""
-# _c.generate(40).each { |x| puts x }
+c.virtual_generate(40)
+c.virtual_to_canvas.each { |x| puts x }
