@@ -214,7 +214,7 @@ class Grid
   # ```
   # delimiter_count_of(3)   # => 2
   # ```
-  private def delimiter_count_of(col_count : Int32) : Int32
+  def delimiter_count_of(col_count : Int32) : Int32
     col_count < 1 ? 0 : col_count - 1
   end
 
@@ -225,7 +225,7 @@ class Grid
   # [["a"], ["b"], ["c"]]
   # delimiter_count         # => 2
   # ```
-  private def delimiter_count : Int32
+  def delimiter_count : Int32
     col_size = @col_width.size
     col_size < 1 ? col_size : col_size - 1
   end
@@ -237,9 +237,9 @@ class Grid
   # [["a"], ["b"], ["c"]]    # [0..1] ~> [["a"], ["b"]]
   # delimiter_count(1)      # => 1
   # ```
-  private def delimiter_count(i : Int32) : Int32
+  def delimiter_count(i : Int32) : Int32
     col_size = @col_width[0..i].size
-    col_size < 1 ? col_size : col_size - 1
+    col_size < 1 ? 0 : col_size - 1
   end
 
   # Get nextly width if we insert the newly str to the last column

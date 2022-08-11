@@ -20,6 +20,59 @@ describe Grid do
     end
   end
   
+  describe ".delimiter_count_of" do
+    it "0 columns should equal 0 delimiter" do
+      grid = create_filled_object
+      grid.delimiter_count_of(0).should eq(0)
+    end
+      
+    (1..10).each do |i|
+      it "#{i} columns should equal #{i-1} delimiter" do
+        grid = create_filled_object
+        grid.delimiter_count_of(i).should eq(i-1)
+      end
+    end
+  end
+  
+  describe ".delimiter_count" do
+    it "0 columns should equal 0 delimiter" do
+      grid = create_object_with_col(0)
+      grid.delimiter_count.should eq(0)
+    end
+      
+    (1..10).each do |i|
+      it "#{i} columns should equal #{i-1} delimiter" do
+        grid = create_object_with_col(i)
+        grid.delimiter_count.should eq(i-1)
+      end
+    end
+  end
+  
+  describe ".delimiter_count" do
+    context "zero column" do
+      it "0 columns should equal 0 delimiter" do
+        grid = create_object_with_col(0)
+        grid.delimiter_count(0).should eq(0)
+      end
+    end
+    
+    context "normal column" do 
+      grid = create_object_with_col(11)
+      (1..10).each do |i|
+        it "#{i} columns should equal #{i-1} delimiter" do
+          grid.delimiter_count(i).should eq(i)
+        end
+      end
+    end
+    
+    context "over-range column should equal largest column exist" do
+      it "[100] column == [5] == 4 delimiter" do
+        grid = create_object_with_col(5)
+        grid.delimiter_count(100).should eq(4)
+      end
+    end
+  end
+  
   describe ".flush" do
     context "all = false" do
       grid = create_filled_object
