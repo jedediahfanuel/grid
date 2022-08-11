@@ -112,6 +112,35 @@ class Grid
     return
   end
 
+  # Generate the virtual canvas based on the current *list* and specified *max width*.
+  # The max width default value is 24.
+  # 
+  # Example:
+  # ```
+  # @canvas = [] of Array(String)
+  # @list = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
+  # 
+  # virtual_generate # generate our virtual canvas with default value of @max_width = 24
+  #
+  # # Then our virtual_canvas are
+  # @col_width = [7, 9]
+  # @col_height = [3, 2]
+  # 
+  # # str_1   str_4000 
+  # # str_30  str_50000
+  # # str_200
+  # 
+  # virtual_generate(25) # generate our virtual canvas @max_width = 25
+  # 
+  # Then our virtual_canvas are
+  # @col_width = [7, 9]
+  # @col_height = [3, 2]
+  # 
+  # # str_1  str_200  str_50000
+  # # str_30 str_4000 
+  # ```
+  #
+  # TODO: currently only support top-down direction
   def virtual_generate(max_w = 24)
     flush
     @max_width = max_w
