@@ -37,8 +37,8 @@ describe Grid do
         grid.col_height.should eq([] of Int32)
       end
       
-      it "should reset the @row" do
-        grid.row.should eq(0)
+      it "should reset the @max_height" do
+        grid.max_height.should eq(0)
       end
       
       it "should reset the @max_width)" do
@@ -62,8 +62,8 @@ describe Grid do
         grid.col_height.should eq([] of Int32)
       end
       
-      it "should reset the @row" do
-        grid.row.should eq(0)
+      it "should reset the @max_height" do
+        grid.max_height.should eq(0)
       end
       
       it "should reset the @max_width)" do
