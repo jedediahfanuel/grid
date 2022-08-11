@@ -208,7 +208,7 @@ class Grid
     return false
   end
 
-  # Count the delimiter of specified column size.
+  # Count the delimiter of specified column count.
   #
   # Example:
   # ```
