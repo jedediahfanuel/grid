@@ -304,4 +304,106 @@ describe Grid do
     end
   end
   
+  describe ".virtual_to_canvas" do
+    context "@list has item(s)" do
+      it "@canvas should not be still empty" do
+        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+        grid.virtual_generate(18)
+        grid.virtual_to_canvas
+        grid.canvas.empty?().should eq(false)
+      end
+      
+      context "correctness check" do
+        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+        it "1st condition" do
+          grid.virtual_generate(18)
+          grid.col_height.should eq([2, 2])
+          grid.col_width.should eq([8, 9])
+          grid.virtual_to_canvas
+          grid.canvas.should eq([["Rubys", "Crystals"], ["Emeralds", "Sapphires"]])
+        end
+        
+        it "2nd condition" do
+          grid.virtual_generate(17)
+          grid.col_height.should eq([4])
+          grid.col_width.should eq([9])
+          grid.virtual_to_canvas
+          grid.canvas.should eq([["Rubys", "Crystals", "Emeralds", "Sapphires"]])
+        end
+        
+        it "3rd condition" do
+          grid.virtual_generate(35)
+          grid.col_height.should eq([1, 1, 1, 1])
+          grid.col_width.should eq([5, 8, 8, 9])
+          grid.virtual_to_canvas
+          grid.canvas.should eq([["Rubys"], ["Crystals"], ["Emeralds"], ["Sapphires"]])
+        end
+      end
+      
+      context "2nd correctness check" do
+        grid = create_virtual_generate("a b c d e f g h i j k l m")
+        
+        it "1st condition" do
+          grid.virtual_generate(100)
+          grid.col_height.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+          grid.col_width.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+          grid.virtual_to_canvas
+          grid.canvas.should eq([["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"], ["i"], ["j"], ["k"], ["l"], ["m"]])
+        end
+        
+        it "2nd condition" do
+          grid.virtual_generate(0)
+          grid.col_height.should eq([13])
+          grid.col_width.should eq([1])
+          grid.virtual_to_canvas
+          grid.canvas.should eq([["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]])
+        end
+        
+        it "3rd condition" do
+          grid.virtual_generate(3)
+          grid.col_height.should eq([7, 6])
+          grid.col_width.should eq([1, 1])
+          grid.virtual_to_canvas
+          grid.canvas.should eq([["a", "b", "c", "d", "e", "f", "g"], ["h", "i", "j", "k", "l", "m"]])
+        end
+      end
+    end
+    
+    context "@list has no item" do
+      grid = Grid.new("")
+      grid.virtual_generate
+      grid.virtual_to_canvas
+      
+      it "@canvas should be still empty" do
+        grid.canvas.empty?().should eq(true)
+      end
+      
+      it "@col_height should have any" do
+        grid.col_height.empty?().should eq(true)
+      end
+      
+      it "@col_width should have any" do
+        grid.col_width.empty?().should eq(true)
+      end
+    end
+    
+    context "@list has item, but virtual_generate has not been called" do
+      grid = Grid.new("Rubys Crystals Emeralds Sapphires")
+      grid.virtual_to_canvas
+      
+      it "@canvas should be one column" do
+        grid.canvas.empty?().should eq(false)
+        grid.canvas.should eq([["Rubys"], ["Crystals"], ["Emeralds"], ["Sapphires"]])
+      end
+      
+      it "@col_height should have any" do
+        grid.col_height.empty?().should eq(true)
+      end
+      
+      it "@col_width should have any" do
+        grid.col_width.empty?().should eq(true)
+      end
+    end
+  end
+  
 end
