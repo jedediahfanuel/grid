@@ -21,14 +21,14 @@ describe Grid do
   end
   
   describe ".delimiter_count_of" do
+    grid = create_filled_object
+    
     it "0 columns should equal 0 delimiter" do
-      grid = create_filled_object
       grid.delimiter_count_of(0).should eq(0)
     end
       
     (1..5).each do |i|
       it "#{i} columns should equal #{i-1} delimiter" do
-        grid = create_filled_object
         grid.delimiter_count_of(i).should eq(i-1)
       end
     end
@@ -96,6 +96,10 @@ describe Grid do
       
       it "should reset the @max_width)" do
         grid.max_width.should eq(0)
+      end
+      
+      it "@list should save" do
+        grid.list.any?.should eq(true)
       end
     end
     
@@ -217,4 +221,87 @@ describe Grid do
       end
     end
   end
+  
+  describe ".virtual_generate" do
+    context "@list has item(s)" do
+      it "@canvas should be still empty" do
+        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+        grid.virtual_generate(18)
+        grid.canvas.empty?().should eq(true)
+      end
+      
+      it "@col_height should have any" do
+        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+        grid.virtual_generate(18)
+        grid.col_height.any?().should eq(true)
+      end
+      
+      it "@col_width should have any" do
+        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+        grid.virtual_generate(18)
+        grid.col_width.any?().should eq(true)
+      end
+      
+      context "correctness check" do
+        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+        it "1st condition" do
+          grid.virtual_generate(18)
+          grid.col_height.should eq([2, 2])
+          grid.col_width.should eq([8, 9])
+        end
+        
+        it "2nd condition" do
+          grid.virtual_generate(17)
+          grid.col_height.should eq([4])
+          grid.col_width.should eq([9])
+        end
+        
+        it "3rd condition" do
+          grid.virtual_generate(35)
+          grid.col_height.should eq([1, 1, 1, 1])
+          grid.col_width.should eq([5, 8, 8, 9])
+        end
+      end
+      
+      context "2nd correctness check" do
+        grid = create_virtual_generate("a b c d e f g h j k l m n")
+        
+        it "1st condition" do
+          grid.virtual_generate(100)
+          grid.col_height.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+          grid.col_width.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+        end
+        
+        it "2nd condition" do
+          grid.virtual_generate(0)
+          grid.col_height.should eq([13])
+          grid.col_width.should eq([1])
+        end
+        
+        it "3rd condition" do
+          grid.virtual_generate(3)
+          grid.col_height.should eq([7, 6])
+          grid.col_width.should eq([1, 1])
+        end
+      end
+    end
+    
+    context "@list has no item" do
+      grid = Grid.new("")
+      grid.virtual_generate
+      
+      it "@canvas should be still empty" do
+        grid.canvas.empty?().should eq(true)
+      end
+      
+      it "@col_height should have any" do
+        grid.col_height.empty?().should eq(true)
+      end
+      
+      it "@col_width should have any" do
+        grid.col_width.empty?().should eq(true)
+      end
+    end
+  end
+  
 end

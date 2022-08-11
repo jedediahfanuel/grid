@@ -8,16 +8,20 @@ def create_filled_object
   return temp
 end
 
-def create_object_with_col(size : Int32)
+def create_object_with_col(size : Int32) : Grid
   temp = Grid.new("")
   temp.col_width = Array(Int32).new(size, 0)
   return temp
 end
 
-def create_object_with_row(height : Int32)
+def create_object_with_row(height : Int32) : Grid
   temp = Grid.new("")
   temp.col_height = Array(Int32).new(1, height)
   temp.col_height << (height - 1)
   return temp
+end
+
+def create_virtual_generate(str : String) : Grid
+  return Grid.new(str)
 end
 
