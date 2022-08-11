@@ -346,7 +346,7 @@ class Grid
   # # str_30
   # ```
   #
-  # If virtual_size argument is larger than *list* size, than it will use the *list* size instead.
+  # If virtual_index argument is larger than *list* size, than it will use the *list* size instead.
   # Example:
   # ```
   # @list = [
@@ -365,7 +365,7 @@ class Grid
   # # str_200
   # ```
   #
-  # Height parameter act same like virtual_size.
+  # Height parameter act same like virtual_index.
   # Example:
   # ```
   # @list = [
@@ -385,11 +385,11 @@ class Grid
   # # str_4000
   # # str_50000
   # ```
-  def virtual_column_width(virtual_col : Int32, virtual_row : Int32) : Tuple(Array(Int32), Int32)
-    virtual_col = virtual_col > @list.size ? -1 : virtual_col
+  def virtual_column_width(virtual_index : Int32, virtual_row : Int32) : Tuple(Array(Int32), Int32)
+    virtual_index = virtual_index > @list.size ? -1 : virtual_index
     last_col_height = 0
 
-    ary = @list[0..virtual_col].each_slice(virtual_row).map do |new_col|
+    ary = @list[0..virtual_index].each_slice(virtual_row).map do |new_col|
       last_col_height = new_col.size
       new_col.max_by { |elm| elm.size }.size
     end.to_a
