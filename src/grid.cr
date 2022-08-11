@@ -34,7 +34,7 @@ class Grid
   # Default value is `24`.
   property max_width = 0
 
-  # Holds the currently highest row.
+  # Holds the currently highest column value.
   #
   # Example:
   # ```
@@ -44,9 +44,9 @@ class Grid
   # ]
   #
   # # so the highest row is 3
-  # # and its became the value of @row
+  # # and its became the value of @max_height
   # ```
-  property row = 0
+  property max_height = 0
 
   # Holds the list of String from the user.
   #
@@ -58,16 +58,16 @@ class Grid
   # ```
   property list : Array(String)
 
-  # Initialize grid with *list* type of `Array(String)` as a input parameter.
-  #
+  # Initialize grid *list* with type of `Array(String)` as a input parameter.
   # Example:
+  #
   # ```
   # Grid.new(["Ruby", "Crystal", "Emerald", "Sapphire"])
   # ```
   def initialize(@list : Array(String))
   end
 
-  # Initialize grid with *list* type of `String` as a input parameter.
+  # Initialize grid *list* with type of `String` as a input parameter.
   #
   # Example:
   # ```
@@ -85,7 +85,7 @@ class Grid
   # # @canvas.clear
   # # @col_height.clear
   # # @col_width.clear
-  # # @row = 0
+  # # @max_height = 0
   # # @max_width = 0
   # ```
   #
@@ -97,7 +97,7 @@ class Grid
   # # @canvas.clear
   # # @col_height.clear
   # # @col_width.clear
-  # # @row = 0
+  # # @max_height = 0
   # # @max_width = 0
   # # @list.clear
   # ```
@@ -105,7 +105,7 @@ class Grid
     @canvas.clear
     @col_height.clear
     @col_width.clear
-    @row = 0
+    @max_height = 0
     @max_width = 0
 
     @list.clear if all
@@ -155,6 +155,7 @@ class Grid
         if get_next_width(str) < @max_width
           @col_height << 1
           @col_width << str.size
+          @max_height = highest_virtual_row
         else
           unless virtual_rearrange(str, i)
             virtual_one_column
@@ -184,18 +185,16 @@ class Grid
 
     @col_height[1..].reverse.each_with_index(1) do |current_col_height, idx|
       (1..(current_col_height + buffer)).each do |i|
-        candidate_col_height = (@col_height.first) + i # TODO: ini coba ganti ke @row += i
+        @max_height += i
         candidate_cols_width, last_col_height = virtual_column_width(
           str_index,
-          candidate_col_height
+          @max_height
         )
         candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size)
 
         if candidate_size <= @max_width
-          @row = candidate_col_height
-
           col_count = @col_height.size - idx + 1
-          @col_height = Array(Int32).new(col_count, @row)
+          @col_height = Array(Int32).new(col_count, @max_height)
           @col_height[-1] = last_col_height
 
           @col_width = candidate_cols_width
@@ -310,8 +309,8 @@ class Grid
     @canvas.clear
     @col_width.clear
     @col_width << @list.max_by { |elm| elm.size }.size
-    @row = @list.size
-    @col_height = [@row]
+    @max_height = @list.size
+    @col_height = [@max_height]
     return
   end
 
@@ -418,3 +417,8 @@ class Grid
   end
 end
 
+a = Grid.new("Rubys Crystals Emeralds Sapphires")
+a.virtual_generate(18)
+a.virtual_to_canvas.each do |x|
+  p x
+end
