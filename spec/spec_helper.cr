@@ -20,3 +20,4 @@ def create_object_with_row(height : Int32)
   temp.col_height << (height - 1)
   return temp
 end
+

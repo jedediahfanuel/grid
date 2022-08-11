@@ -129,14 +129,33 @@ describe Grid do
     end
   end
   
-  describe ".highest_virtual_row" do
-    context "normal column" do 
-      (1..5).each do |i|
-        grid = create_object_with_row(i)
-        it "highest row should be #{i}" do
-          grid.highest_virtual_row.should eq(i)
-        end
+  describe ".highest_virtual_row" do  
+    (1..5).each do |i|
+      grid = create_object_with_row(i)
+      it "highest row should be #{i}" do
+        grid.highest_virtual_row.should eq(i)
       end
+    end
+  end
+  
+  describe ".virtual_one_column" do
+    grid = Grid.new("Crystal Ruby Emerald Sapphire")
+    grid.virtual_one_column
+    
+    it "should resulting one virtual column" do
+      grid.col_width.size.should eq(1)
+    end
+    
+    it "should resulting one virtual column" do
+      grid.col_height.size.should eq(1)
+    end
+    
+    it "canvas should equal to 1 column" do
+      grid.virtual_to_canvas.size.should eq(1)
+    end
+    
+    it "canvas column should equal to @list size" do
+      grid.virtual_to_canvas.last.size.should eq(grid.list.size)
     end
   end
 end
