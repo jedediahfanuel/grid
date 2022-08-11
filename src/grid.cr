@@ -140,7 +140,7 @@ class Grid
   # # str_30 str_4000 
   # ```
   #
-  # TODO: currently only support top-down direction
+  # NOTE: currently only support top-down direction
   def virtual_generate(max_w = 24)
     flush
     @max_width = max_w
