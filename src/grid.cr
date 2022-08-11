@@ -185,14 +185,16 @@ class Grid
 
     @col_height[1..].reverse.each_with_index(1) do |current_col_height, idx|
       (1..(current_col_height + buffer)).each do |i|
-        @max_height += i
+        candidate_cols_height = @col_height.first + 1
         candidate_cols_width, last_col_height = virtual_column_width(
           str_index,
-          @max_height
+          candidate_cols_height
         )
         candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size)
 
         if candidate_size <= @max_width
+          @max_height = candidate_cols_height
+          
           col_count = @col_height.size - idx + 1
           @col_height = Array(Int32).new(col_count, @max_height)
           @col_height[-1] = last_col_height
