@@ -385,9 +385,7 @@ class Grid
   # ]
   # ```
   def virtual_to_canvas : Array(Array(String))
-    @canvas = @list.each_slice(highest_virtual_row).map do |col|
-      col
-    end.to_a
+    @canvas = @list.each_slice(highest_virtual_row).map{ |col| col }.to_a
   end
 end
 
