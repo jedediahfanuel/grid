@@ -9,7 +9,7 @@ A string grid formatter library for crystal programming language.
    ```yaml
    dependencies:
      grid:
-       github: your-github-user/grid
+       github: Jeddi212/grid
    ```
 
 2. Run `shards install`
