@@ -199,18 +199,6 @@ class Grid
     return
   end
 
-  # Rearrange the current column & row due to newly str proceed to the canvas.
-  private def rearrange(str_index : Int32, col_count : Int32)
-    @row = (str_index + 1 / col_count).ceil.to_i
-    @canvas.clear
-    @col_width.clear
-
-    @list[0..str_index].each_slice(@row) do |new_col|
-      @canvas << new_col
-      @col_width << new_col.max_by { |elm| elm.size }.size
-    end
-  end
-
   # Count the delimiter of the whole column.
   # Example:
   # ```
@@ -272,6 +260,18 @@ class Grid
     @list.join("\n")
   end
 
+  # Get the highest of col_height.
+  #
+  # Example:
+  # ```
+  # @col_height = [4, 4, 3]
+  # highest_virtual_row # => 4
+  # ```
+  private def highest_virtual_row : Int32
+    temp = @col_height.max?
+    temp ? temp : 0
+  end
+  
   # Calculate the row & height to the one column sized.
   #
   # Example:
@@ -292,18 +292,6 @@ class Grid
     @row = @list.size
     @col_height = [@row]
     return
-  end
-
-  # Get the highest of col_height.
-  #
-  # Example:
-  # ```
-  # @col_height = [4, 4, 3]
-  # highest_virtual_row # => 4
-  # ```
-  private def highest_virtual_row : Int32
-    temp = @col_height.max?
-    temp ? temp : 0
   end
 
   # Calculate column width for canvas virtually to the range of data.
