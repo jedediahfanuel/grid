@@ -85,8 +85,8 @@ class Grid
   # # @canvas.clear
   # # @col_height.clear
   # # @col_width.clear
-  # # @col_ptr = 0
   # # @row = 0
+  # # @max_width = 0
   # ```
   #
   # Use `flush(true)` will reset the *list* variable too.
@@ -97,16 +97,16 @@ class Grid
   # # @canvas.clear
   # # @col_height.clear
   # # @col_width.clear
-  # # @col_ptr = 0
   # # @row = 0
+  # # @max_width = 0
   # # @list.clear
   # ```
   def flush(all : Bool = false)
     @canvas.clear
     @col_height.clear
     @col_width.clear
-    @col_ptr = 0
     @row = 0
+    @max_width = 0
 
     @list.clear if all
     return
