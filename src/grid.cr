@@ -389,21 +389,3 @@ class Grid
   end
 end
 
-a = Grid.new("Rubys Crystals Emeralds Sapphires")
-b = Grid.new("Ruby Crystal Emerald Sapphire")
-c = Grid.new(["Java", "Lua", "C#", "Perl", "Kotlin", "ABAB", "Pascal", "Rust", "Zig", "C++", "C", "APL"])
-
-a.virtual_generate(18)
-a.virtual_to_canvas.each { |x| puts x }
-p ""
-p ""
-p ""
-p ""
-b.virtual_generate(20)
-b.virtual_to_canvas.each { |x| puts x }
-p ""
-p ""
-p ""
-p ""
-c.virtual_generate(40)
-c.virtual_to_canvas.each { |x| puts x }
