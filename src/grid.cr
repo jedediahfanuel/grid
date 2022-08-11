@@ -380,11 +380,11 @@ class Grid
   # # str_4000
   # # str_50000
   # ```
-  def virtual_column_width(virtual_size : Int32, height : Int32) : Tuple(Array(Int32), Int32)
-    virtual_size = virtual_size > @list.size ? -1 : virtual_size
+  def virtual_column_width(virtual_col : Int32, virtual_row : Int32) : Tuple(Array(Int32), Int32)
+    virtual_col = virtual_col > @list.size ? -1 : virtual_col
     last_col_height = 0
 
-    ary = @list[0..virtual_size].each_slice(height).map do |new_col|
+    ary = @list[0..virtual_col].each_slice(virtual_row).map do |new_col|
       last_col_height = new_col.size
       new_col.max_by { |elm| elm.size }.size
     end.to_a
@@ -417,8 +417,3 @@ class Grid
   end
 end
 
-a = Grid.new("Rubys Crystals Emeralds Sapphires")
-a.virtual_generate(18)
-a.virtual_to_canvas.each do |x|
-  p x
-end
