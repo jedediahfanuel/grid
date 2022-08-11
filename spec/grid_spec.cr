@@ -26,7 +26,7 @@ describe Grid do
       grid.delimiter_count_of(0).should eq(0)
     end
       
-    (1..10).each do |i|
+    (1..5).each do |i|
       it "#{i} columns should equal #{i-1} delimiter" do
         grid = create_filled_object
         grid.delimiter_count_of(i).should eq(i-1)
@@ -40,7 +40,7 @@ describe Grid do
       grid.delimiter_count.should eq(0)
     end
       
-    (1..10).each do |i|
+    (1..5).each do |i|
       it "#{i} columns should equal #{i-1} delimiter" do
         grid = create_object_with_col(i)
         grid.delimiter_count.should eq(i-1)
@@ -58,7 +58,7 @@ describe Grid do
     
     context "normal column" do 
       grid = create_object_with_col(11)
-      (1..10).each do |i|
+      (1..5).each do |i|
         it "#{i+1} columns should equal #{i} delimiter" do
           grid.delimiter_count(i).should eq(i)
         end
@@ -131,7 +131,7 @@ describe Grid do
   
   describe ".highest_virtual_row" do
     context "normal column" do 
-      (1..10).each do |i|
+      (1..5).each do |i|
         grid = create_object_with_row(i)
         it "highest row should be #{i}" do
           grid.highest_virtual_row.should eq(i)
