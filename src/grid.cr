@@ -265,23 +265,6 @@ class Grid
     @col_width[0..i].sum(0) + delimiter_count(i) + str.size
   end
 
-  # Join the *list* with `'\n'` and convert it to the type of String
-  #
-  # Example:
-  # ```
-  # @list = [
-  #   "str_1",
-  #   "str_3",
-  #   "str_2",
-  #   "str_4",
-  #   "str_5",
-  # ]
-  # one_column # => "str_1\nstr_3\nstr_2\nstr_4\nstr5"
-  # ```
-  def one_column : String
-    @list.join("\n")
-  end
-
   # Get the highest of col_height.
   #
   # Example:
