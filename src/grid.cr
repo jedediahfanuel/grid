@@ -146,7 +146,10 @@ class Grid
     end
   end
 
-  def virtual_rearrange(str : String, str_index : Int32) : Bool
+  # Rearrange the virtual canvas due to newly str.
+  # It returns `true` if there's a valid re-arrangement.
+  # It returns `false` if there's no valid re-arrangement.
+  private def virtual_rearrange(str : String, str_index : Int32) : Bool
     @col_height[-1] += 1
     @col_width[-1], buffer = str.size, 0
 
@@ -189,6 +192,12 @@ class Grid
     is_fit
   end
 
+  # Count the delimiter of specified column size.
+  #
+  # Example:
+  # ```
+  # delimiter_count_of(3)   # => 2
+  # ```
   private def delimiter_count_of(col_count : Int32) : Int32
     col_count < 1 ? 0 : col_count - 1
   end
@@ -196,20 +205,21 @@ class Grid
   # Count the delimiter of the whole column.
   # Example:
   # ```
-  # Say we have this @col_width
-  # @col_width[, "b", "c"]
-  # delimiter_count   # => 2
+  # # Say we have a list like this
+  # [["a"], ["b"], ["c"]]
+  # delimiter_count         # => 2
   # ```
   private def delimiter_count : Int32
     col_size = @col_width.size
     col_size < 1 ? col_size : col_size - 1
   end
 
-  # Count the delimiter of ranged column from range first to the last column.
+  # Count the delimiter of ranged column from range first to the specified index.
   # Example:
   # ```
-  # ["a", "b", "c"]
-  # delimiter_count(1) # => ["a", "b"]
+  # # Say we have a list like this
+  # [["a"], ["b"], ["c"]]    # [0..1] ~> [["a"], ["b"]]
+  # delimiter_count(1)      # => 1
   # ```
   private def delimiter_count(i : Int32) : Int32
     col_size = @col_width[0..i].size
@@ -366,6 +376,26 @@ class Grid
     return ary, last_col_height
   end
   
+  # Install the *list* to the *canvas* based on the virtual_canvas.
+  # 
+  # Example:
+  # ```
+  # @canvas = [] of Array(String)
+  # @list = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
+  # 
+  # # Then our virtual_canvas are
+  # @col_width = [7, 9]
+  # @col_height = [3, 2]
+  # 
+  # # Then we call `virtual_to_canvas`
+  # virtual_to_canvas
+  # 
+  # # Our canvas would be like this
+  # @canvas = [
+  #   ["str_1", "str_30", "str_200"],  # this is column 1
+  #   ["str_4000", "str_50000"],       # this is column 2
+  # ]
+  # ```
   def virtual_to_canvas : Array(Array(String))
     @canvas = @list.each_slice(highest_virtual_row).map do |col|
       col
