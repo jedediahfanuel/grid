@@ -37,7 +37,7 @@ Work in progress
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/grid/fork>)
+1. Fork it (<https://github.com/Jeddi212/grid/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -45,7 +45,7 @@ Work in progress
 
 ## Contributors
 
-- [Jeddi212](https://github.com/your-github-user) - creator and maintainer
+- [Jeddi212](https://github.com/Jeddi212) - creator and maintainer
 
 <hr>
 
