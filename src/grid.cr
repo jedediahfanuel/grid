@@ -168,17 +168,17 @@ class Grid
           @row_height << 1                        # just append it as the first element
           @col_width << str.size
         else                                       # if not fit, me must re arrange the canvas, -1 col
-          unless virtual_rearrange(str, i, @col_ptr + 1)
+          unless virtual_rearrange(str, i)
             virtual_one_column
             return virtual_to_canvas
           end
         end
       else                                         # the last col has some space for the new str
-        if get_next_width(str) < @max_width        # if the new col of str.size is fit the max width size
+        if get_next_width(str, 2) < @max_width        # if the new col of str.size is fit the max width size
           @row_height[-1] += 1                     # just append it to the last element
           @col_width[-1] = str.size if str.size > @col_width[-1] # update the col_width if new str size is bigger
         else                                       # if not fit, me must re arrange the canvas, -1 col
-          unless virtual_rearrange(str, i, @col_ptr + 1)
+          unless virtual_rearrange(str, i)
             virtual_one_column
             return virtual_to_canvas
           end
@@ -189,16 +189,7 @@ class Grid
     virtual_to_canvas
   end
   
-  def virtual_rearrange(str : String, str_index : Int32, col_count : Int32) : Bool
-    # Langsung bagi ke kolom yang muat nya misal dari 3 kolom ke 2 kolom
-    # @row += (@row_height.last / col_count).ceil.to_i
-    # 
-    # @list[0..str_index].each_slice(@row) do |new_col|
-    #   @canvas << new_col
-    #   @col_width << new_col.max_by { |elm| elm.size }.size
-    # end
-    
-    # one by one
+  def virtual_rearrange(str : String, str_index : Int32) : Bool
     @row_height[-1] += 1 # pura pura dimasukin
     @col_width[-1]   = str.size # pura pura dimasukin
     buffer = 0
@@ -207,11 +198,10 @@ class Grid
         candidate_row_height  = (@row_height.first) + i # TODO: ini coba ganti ke @row += i
         candidate_cols_width, last_row_height  = virtual_column_width(
           str_index, 
-          candidate_row_height, 
-          col_count
+          candidate_row_height
         )
-        candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size) + str.size
-
+        candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size)
+        
         if candidate_size <= @max_width # Artinya, ada ukuran kolom yang fit
           @row = candidate_row_height
           
@@ -371,7 +361,7 @@ class Grid
     temp ? temp : 0
   end
   
-  def virtual_column_width(index : Int32, height : Int32, col_count : Int32) : Tuple(Array(Int32), Int32)
+  def virtual_column_width(index : Int32, height : Int32) : Tuple(Array(Int32), Int32)
     last_row_height = 0
     
     ary = @list[0..index].each_slice(height).map do |new_col|
@@ -387,7 +377,7 @@ a = Grid.new("Rubys Crystals Emeralds Sapphires")
 b = Grid.new("Ruby Crystal Emerald Sapphire")
 c = Grid.new(["Java", "Lua", "C#", "Perl", "Kotlin", "ABAB", "Pascal", "Rust", "Zig", "C++", "C", "APL"])
 
-a.virtual_generate().each { |x| puts x }
+a.virtual_generate(18).each { |x| puts x }
 p ""
 p ""
 p ""
@@ -404,18 +394,18 @@ p ""
 p ""
 
 
-_a = Grid.new("Rubys Crystals Emeralds Sapphires")
-_b = Grid.new("Ruby Crystal Emerald Sapphire")
-_c = Grid.new(["Java", "Lua", "C#", "Perl", "Kotlin", "ABAB", "Pascal", "Rust", "Zig", "C++", "C", "APL"])
+# _a = Grid.new("Rubys Crystals Emeralds Sapphires")
+# _b = Grid.new("Ruby Crystal Emerald Sapphire")
+# _c = Grid.new(["Java", "Lua", "C#", "Perl", "Kotlin", "ABAB", "Pascal", "Rust", "Zig", "C++", "C", "APL"])
 
-_a.generate(20).each { |x| puts x }
-p ""
-p ""
-p ""
-p ""
-_b.generate(20).each { |x| puts x }
-p ""
-p ""
-p ""
-p ""
-_c.generate(40).each { |x| puts x }
+# _a.generate(20).each { |x| puts x }
+# p ""
+# p ""
+# p ""
+# p ""
+# _b.generate(20).each { |x| puts x }
+# p ""
+# p ""
+# p ""
+# p ""
+# _c.generate(40).each { |x| puts x }
