@@ -158,4 +158,63 @@ describe Grid do
       grid.virtual_to_canvas.last.size.should eq(grid.list.size)
     end
   end
+  
+  describe ".virtual_column_width" do
+    grid = Grid.new("str_1 str_20 str_300 str_4000 str_50000")
+    
+    context "normal condition" do
+      it "should be one column" do
+        ary, last_col_height = grid.virtual_column_width(2, grid.list.size)
+        ary.size.should eq(1)
+        ary.should eq([7])
+        last_col_height.should eq(3)
+      end
+      
+      it "should be two column" do
+        ary, last_col_height = grid.virtual_column_width(2, 2)
+        ary.size.should eq(2)
+        ary.should eq([6, 7])
+        last_col_height.should eq(3 % 2)
+      end
+      
+      it "should be the largest column possible" do
+        ary, last_col_height = grid.virtual_column_width(grid.list.size, 1)
+        ary.size.should eq(grid.list.size)
+        ary.should eq([5, 6, 7, 8, 9])
+        last_col_height.should eq(1)
+      end
+    end
+    
+    context "over-range" do
+      it "virtual_index should act as all data" do
+        ary, last_col_height = grid.virtual_column_width(4, grid.list.size)
+        ary.size.should eq(1)
+        ary.should eq([9])
+        last_col_height.should eq(5)
+        
+        ary_over, last_col_height_over = grid.virtual_column_width(100, grid.list.size)
+        ary_over.size.should eq(1)
+        ary_over.should eq([9])
+        last_col_height_over.should eq(5)
+        
+        ary.size.should eq(ary_over.size)
+        last_col_height.should eq(last_col_height_over)
+      end
+      
+      it "virtual_row should act as one column" do
+        ary, last_col_height = grid.virtual_column_width(4, grid.list.size)
+        ary.size.should eq(1)
+        ary.should eq([9])
+        last_col_height.should eq(5)
+        
+        ary_over, last_col_height_over = grid.virtual_column_width(4, 100)
+        ary_over.size.should eq(1)
+        ary_over.should eq([9])
+        last_col_height_over.should eq(5)
+        
+        ary.size.should eq(ary_over.size)
+        last_col_height.should eq(last_col_height_over)
+      end
+    end
+  end
 end

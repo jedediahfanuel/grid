@@ -347,6 +347,7 @@ class Grid
   # ```
   #
   # If virtual_index argument is larger than *list* size, than it will use the *list* size instead.
+  # NOTE: virtual index is act like an index `its starts from 0`
   # Example:
   # ```
   # @list = [
