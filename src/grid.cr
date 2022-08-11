@@ -76,6 +76,40 @@ class Grid
   def initialize(str : String)
     @list = str.strip.split
   end
+
+  # Count the delimiter of specified column count.
+  #
+  # Example:
+  # ```
+  # delimiter_count_of(3)   # => 2
+  # ```
+  def delimiter_count_of(col_count : Int32) : Int32
+    col_count < 1 ? 0 : col_count - 1
+  end
+
+  # Count the delimiter of the whole column.
+  # Example:
+  # ```
+  # # Say we have a list like this
+  # [["a"], ["b"], ["c"]]
+  # delimiter_count         # => 2
+  # ```
+  def delimiter_count : Int32
+    col_size = @col_width.size
+    col_size < 1 ? col_size : col_size - 1
+  end
+
+  # Count the delimiter of ranged column from range first to the specified index.
+  # Example:
+  # ```
+  # # Say we have a list like this
+  # [["a"], ["b"], ["c"]]    # [0..1] ~> [["a"], ["b"]]
+  # delimiter_count(1)      # => 1
+  # ```
+  def delimiter_count(i : Int32) : Int32
+    col_size = @col_width[0..i].size
+    col_size < 1 ? 0 : col_size - 1
+  end
   
   # Flush all of the variable.
   #
@@ -112,138 +146,6 @@ class Grid
     return
   end
 
-  # Generate the virtual canvas based on the current *list* and specified *max width*.
-  # The max width default value is 24.
-  # 
-  # Example:
-  # ```
-  # @canvas = [] of Array(String)
-  # @list = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
-  # 
-  # virtual_generate # generate our virtual canvas with default value of @max_width = 24
-  #
-  # # Then our virtual_canvas are
-  # @col_width = [7, 9]
-  # @col_height = [3, 2]
-  # 
-  # # str_1   str_4000 
-  # # str_30  str_50000
-  # # str_200
-  # 
-  # virtual_generate(25) # generate our virtual canvas @max_width = 25
-  # 
-  # Then our virtual_canvas are
-  # @col_width = [7, 9]
-  # @col_height = [3, 2]
-  # 
-  # # str_1  str_200  str_50000
-  # # str_30 str_4000 
-  # ```
-  #
-  # NOTE: currently only support top-down direction
-  def virtual_generate(max_w = 24)
-    flush
-    @max_width = max_w
-
-    @list.each_with_index do |str, i|
-      if str.size >= @max_width
-        virtual_one_column
-        return
-      end
-
-      if @col_height.empty? || @col_height.last >= highest_virtual_row
-        if get_next_width(str) < @max_width
-          @col_height << 1
-          @col_width << str.size
-          @max_height = highest_virtual_row
-        else
-          unless virtual_rearrange(str, i)
-            virtual_one_column
-            return
-          end
-        end
-      else
-        if get_next_width(str, -2) < @max_width
-          @col_height[-1] += 1
-          @col_width[-1] = str.size if str.size > @col_width[-1]
-        else
-          unless virtual_rearrange(str, i)
-            virtual_one_column
-            return
-          end
-        end
-      end
-    end
-  end
-
-  # Rearrange the virtual canvas due to newly str.
-  # It returns `true` if there's a valid re-arrangement.
-  # It returns `false` if there's no valid re-arrangement.
-  private def virtual_rearrange(str : String, str_index : Int32) : Bool
-    @col_height[-1] += 1
-    @col_width[-1], buffer = str.size, 0
-
-    @col_height[1..].reverse.each_with_index(1) do |current_col_height, idx|
-      (1..(current_col_height + buffer)).each do |i|
-        candidate_cols_height = @col_height.first + i
-        candidate_cols_width, last_col_height = virtual_column_width(
-          str_index,
-          candidate_cols_height
-        )
-        candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size)
-
-        if candidate_size <= @max_width
-          @max_height = candidate_cols_height
-          
-          col_count = candidate_cols_width.size
-          @col_height = Array(Int32).new(col_count, @max_height)
-          @col_height[-1] = last_col_height
-
-          @col_width = candidate_cols_width
-          return true
-        end
-      end
-
-      buffer += current_col_height
-    end
-
-    return false
-  end
-
-  # Count the delimiter of specified column count.
-  #
-  # Example:
-  # ```
-  # delimiter_count_of(3)   # => 2
-  # ```
-  def delimiter_count_of(col_count : Int32) : Int32
-    col_count < 1 ? 0 : col_count - 1
-  end
-
-  # Count the delimiter of the whole column.
-  # Example:
-  # ```
-  # # Say we have a list like this
-  # [["a"], ["b"], ["c"]]
-  # delimiter_count         # => 2
-  # ```
-  def delimiter_count : Int32
-    col_size = @col_width.size
-    col_size < 1 ? col_size : col_size - 1
-  end
-
-  # Count the delimiter of ranged column from range first to the specified index.
-  # Example:
-  # ```
-  # # Say we have a list like this
-  # [["a"], ["b"], ["c"]]    # [0..1] ~> [["a"], ["b"]]
-  # delimiter_count(1)      # => 1
-  # ```
-  def delimiter_count(i : Int32) : Int32
-    col_size = @col_width[0..i].size
-    col_size < 1 ? 0 : col_size - 1
-  end
-
   # Get nextly width if we insert the newly str to the last column
   # `@col_width + delimiter_count + str.size`.
   private def get_next_width(str : String) : Int32
@@ -275,33 +177,6 @@ class Grid
   def highest_virtual_row : Int32
     temp = @col_height.max?
     temp ? temp : 0
-  end
-  
-  # Calculate the row & height to the one column sized.
-  #
-  # Example:
-  # ```
-  # @list = [
-  #   "str_1",
-  #   "str_3",
-  #   "str_2",
-  #   "str_4",
-  #   "str_5",
-  #   "str_6",
-  #   "str_7",
-  # ]
-  # 
-  # virtual_one_column
-  # # @col_width = [5]
-  # # @col_height = [7]
-  # ```
-  def virtual_one_column
-    @canvas.clear
-    @col_width.clear
-    @col_width << @list.max_by { |elm| elm.size }.size
-    @max_height = @list.size
-    @col_height = [@max_height]
-    return
   end
 
   # Calculate column width for canvas virtually to the range of data.
@@ -381,6 +256,131 @@ class Grid
     end.to_a
 
     return ary, last_col_height
+  end
+  
+  # Calculate the row & height to the one column sized.
+  #
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1",
+  #   "str_3",
+  #   "str_2",
+  #   "str_4",
+  #   "str_5",
+  #   "str_6",
+  #   "str_7",
+  # ]
+  # 
+  # virtual_one_column
+  # # @col_width = [5]
+  # # @col_height = [7]
+  # ```
+  def virtual_one_column
+    @canvas.clear
+    @col_width.clear
+    @col_width << @list.max_by { |elm| elm.size }.size
+    @max_height = @list.size
+    @col_height = [@max_height]
+    return
+  end
+  
+  # Generate the virtual canvas based on the current *list* and specified *max width*.
+  # The max width default value is 24.
+  # 
+  # Example:
+  # ```
+  # @canvas = [] of Array(String)
+  # @list = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
+  # 
+  # virtual_generate # generate our virtual canvas with default value of @max_width = 24
+  #
+  # # Then our virtual_canvas are
+  # @col_width = [7, 9]
+  # @col_height = [3, 2]
+  # 
+  # # str_1   str_4000 
+  # # str_30  str_50000
+  # # str_200
+  # 
+  # virtual_generate(25) # generate our virtual canvas @max_width = 25
+  # 
+  # Then our virtual_canvas are
+  # @col_width = [7, 9]
+  # @col_height = [3, 2]
+  # 
+  # # str_1  str_200  str_50000
+  # # str_30 str_4000 
+  # ```
+  #
+  # NOTE: currently only support top-down direction
+  def virtual_generate(max_w = 24)
+    flush
+    @max_width = max_w
+
+    @list.each_with_index do |str, i|
+      if str.size >= @max_width
+        virtual_one_column
+        return
+      end
+
+      if @col_height.empty? || @col_height.last >= highest_virtual_row
+        if get_next_width(str) < @max_width
+          @col_height << 1
+          @col_width << str.size
+          @max_height = highest_virtual_row
+        else
+          unless virtual_rearrange(str, i)
+            virtual_one_column
+            return
+          end
+        end
+      else
+        if get_next_width(str, -2) < @max_width
+          @col_height[-1] += 1
+          @col_width[-1] = str.size if str.size > @col_width[-1]
+        else
+          unless virtual_rearrange(str, i)
+            virtual_one_column
+            return
+          end
+        end
+      end
+    end
+  end
+  
+  # Rearrange the virtual canvas due to newly str.
+  # It returns `true` if there's a valid re-arrangement.
+  # It returns `false` if there's no valid re-arrangement.
+  private def virtual_rearrange(str : String, str_index : Int32) : Bool
+    @col_height[-1] += 1
+    @col_width[-1], buffer = str.size, 0
+
+    @col_height[1..].reverse.each_with_index(1) do |current_col_height, idx|
+      (1..(current_col_height + buffer)).each do |i|
+        candidate_cols_height = @col_height.first + i
+        candidate_cols_width, last_col_height = virtual_column_width(
+          str_index,
+          candidate_cols_height
+        )
+        candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size)
+
+        if candidate_size <= @max_width
+          @max_height = candidate_cols_height
+          
+          col_count = candidate_cols_width.size
+          @col_height = Array(Int32).new(col_count, @max_height)
+          @col_height[-1] = last_col_height
+
+          @col_width = candidate_cols_width
+          return true
+        end
+      end
+
+      buffer += current_col_height
+    end
+
+    return false
   end
   
   # Install the *list* to the *canvas* based on the virtual_canvas.
