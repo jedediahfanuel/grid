@@ -287,7 +287,7 @@ class Grid
   # @col_height = [4, 4, 3]
   # highest_virtual_row # => 4
   # ```
-  private def highest_virtual_row : Int32
+  def highest_virtual_row : Int32
     temp = @col_height.max?
     temp ? temp : 0
   end

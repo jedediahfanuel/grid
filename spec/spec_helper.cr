@@ -13,3 +13,10 @@ def create_object_with_col(size : Int32)
   temp.col_width = Array(Int32).new(size, 0)
   return temp
 end
+
+def create_object_with_row(height : Int32)
+  temp = Grid.new("")
+  temp.col_height = Array(Int32).new(1, height)
+  temp.col_height << (height - 1)
+  return temp
+end
