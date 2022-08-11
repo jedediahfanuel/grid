@@ -180,18 +180,6 @@ class Grid
     return false
   end
 
-  private def virtual_check_col(str : String) : Int32
-    is_fit = -1
-
-    (2..@col_width.size).each do |i|
-      if get_next_width(str, -i) < @max_width
-        break is_fit = @col_width.size - i
-      end
-    end
-
-    is_fit
-  end
-
   # Count the delimiter of specified column size.
   #
   # Example:
