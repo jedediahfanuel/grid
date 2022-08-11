@@ -76,6 +76,41 @@ class Grid
   def initialize(str : String)
     @list = str.strip.split
   end
+  
+  # Flush all of the variable.
+  #
+  # Example:
+  # ```
+  # flush
+  # # @canvas.clear
+  # # @col_height.clear
+  # # @col_width.clear
+  # # @col_ptr = 0
+  # # @row = 0
+  # ```
+  #
+  # Use `flush(true)` will reset the *list* variable too.
+  #
+  # Example:
+  # ```
+  # flush(true)
+  # # @canvas.clear
+  # # @col_height.clear
+  # # @col_width.clear
+  # # @col_ptr = 0
+  # # @row = 0
+  # # @list.clear
+  # ```
+  def flush(all : Bool = false)
+    @canvas.clear
+    @col_height.clear
+    @col_width.clear
+    @col_ptr = 0
+    @row = 0
+
+    @list.clear if all
+    return
+  end
 
   def virtual_generate(max_w = 24)
     flush
@@ -156,47 +191,6 @@ class Grid
 
   private def delimiter_count_of(col_count : Int32) : Int32
     col_count < 1 ? 0 : col_count - 1
-  end
-
-  def virtual_to_canvas : Array(Array(String))
-    @canvas = @list.each_slice(highest_virtual_row).map do |col|
-      col
-    end.to_a
-  end
-
-  # Flush all of the variable.
-  #
-  # Example:
-  # ```
-  # flush
-  # # @canvas.clear
-  # # @col_height.clear
-  # # @col_width.clear
-  # # @col_ptr = 0
-  # # @row = 0
-  # ```
-  #
-  # Use `flush(true)` will reset the *list* variable too.
-  #
-  # Example:
-  # ```
-  # flush(true)
-  # # @canvas.clear
-  # # @col_height.clear
-  # # @col_width.clear
-  # # @col_ptr = 0
-  # # @row = 0
-  # # @list.clear
-  # ```
-  def flush(all : Bool = false)
-    @canvas.clear
-    @col_height.clear
-    @col_width.clear
-    @col_ptr = 0
-    @row = 0
-
-    @list.clear if all
-    return
   end
 
   # Count the delimiter of the whole column.
@@ -370,6 +364,12 @@ class Grid
     end.to_a
 
     return ary, last_col_height
+  end
+  
+  def virtual_to_canvas : Array(Array(String))
+    @canvas = @list.each_slice(highest_virtual_row).map do |col|
+      col
+    end.to_a
   end
 end
 
