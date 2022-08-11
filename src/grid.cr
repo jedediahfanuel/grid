@@ -17,11 +17,17 @@ class Grid
   # ```
   property col_width = [] of Int32
   
-  property row_height = [] of Int32
-  
-  # Used to hold the column index position
-  # for `rearrange`
-  property col_ptr   = 0
+  # Holds curently max height for every column.
+  # 
+  # Example:
+  # ```
+  # @col_height = [4, 4, 3]
+  #
+  # # => 1st column height is 4 string
+  # # => 2nd column height is 4 string
+  # # => 3rd column height is 3 string
+  # ```
+  property col_height = [] of Int32
   
   # Holds the max width of the canvas.
   # Its defined by the user.
@@ -72,48 +78,30 @@ class Grid
   end
   
   def virtual_generate(max_w = 24)
-    @canvas.clear
-    @row_height.clear
-    @col_width.clear
-    @col_ptr = 0
-    @row = 0
+    flush
     @max_width = max_w
-    # return ArgumentError.new("Max width is invalid") if @max_width < 1
     
-    # cek str size tambah cur size, kalau kelewatan, coba cek jika dihitung dari 
-    # col sebelumnya
-    # kalau masih belum bisa, cek lagi ke col sebelumnya,
-    # kalau sudah col [0], tambahin aja langsung
-    
-    # penambahannya, tambahin dulu semua elemen row pada kolom ini, baru str yg sekarang
-    # kalau misal ga jadi satu kolom (2, 3, dst)
-    # hitung panjang array sekarang
-    # terus bagi rata ke jumlah kolom
-    
-    # terus harus reset col_width masing-masing col
-    # terus hitung lagi masing-masing kolom berapa width nya
-    # jumlah row nya juga update
     @list.each_with_index do |str, i|
       if str.size >= @max_width
         virtual_one_column
         return
       end
       
-      if @row_height.empty? || @row_height.last >= highest_virtual_row # empty canvas || the latest col is full -> make new col
-        if get_next_width(str) < @max_width        # if the new col of str.size is fit the max width size
-          @row_height << 1                        # just append it as the first element
+      if @col_height.empty? || @col_height.last >= highest_virtual_row
+        if get_next_width(str) < @max_width
+          @col_height << 1
           @col_width << str.size
-        else                                       # if not fit, me must re arrange the canvas, -1 col
+        else
           unless virtual_rearrange(str, i)
             virtual_one_column
             return
           end
         end
-      else                                         # the last col has some space for the new str
-        if get_next_width(str, -2) < @max_width        # if the new col of str.size is fit the max width size
-          @row_height[-1] += 1                     # just append it to the last element
-          @col_width[-1] = str.size if str.size > @col_width[-1] # update the col_width if new str size is bigger
-        else                                       # if not fit, me must re arrange the canvas, -1 col
+      else
+        if get_next_width(str, -2) < @max_width
+          @col_height[-1] += 1
+          @col_width[-1] = str.size if str.size > @col_width[-1]
+        else
           unless virtual_rearrange(str, i)
             virtual_one_column
             return
@@ -124,31 +112,31 @@ class Grid
   end
   
   def virtual_rearrange(str : String, str_index : Int32) : Bool
-    @row_height[-1] += 1 # pura pura dimasukin
-    @col_width[-1]   = str.size # pura pura dimasukin
-    buffer = 0
-    @row_height[1..].reverse.each_with_index(1) do |current_row_height, idx|
-      (1..(current_row_height + buffer)).each do |i|
-        candidate_row_height  = (@row_height.first) + i # TODO: ini coba ganti ke @row += i
-        candidate_cols_width, last_row_height  = virtual_column_width(
+    @col_height[-1] += 1
+    @col_width[-1], buffer = str.size, 0
+    
+    @col_height[1..].reverse.each_with_index(1) do |current_col_height, idx|
+      (1..(current_col_height + buffer)).each do |i|
+        candidate_col_height  = (@col_height.first) + i # TODO: ini coba ganti ke @row += i
+        candidate_cols_width, last_col_height  = virtual_column_width(
           str_index, 
-          candidate_row_height
+          candidate_col_height
         )
         candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size)
         
-        if candidate_size <= @max_width # Artinya, ada ukuran kolom yang fit
-          @row = candidate_row_height
+        if candidate_size <= @max_width
+          @row = candidate_col_height
           
-          col_count = @row_height.size - idx + 1
-          @row_height = Array(Int32).new(col_count, @row)
-          @row_height[-1] = last_row_height
+          col_count = @col_height.size - idx + 1
+          @col_height = Array(Int32).new(col_count, @row)
+          @col_height[-1] = last_col_height
 
           @col_width = candidate_cols_width
           return true
         end
       end
       
-      buffer += current_row_height
+      buffer += current_col_height
     end
     
     return false
@@ -176,23 +164,39 @@ class Grid
     end.to_a
   end
   
-  # Flush (reset) the data from these attribute.
+  # Flush all of the variable.
+  #
+  # Example:
   # ```
-  # @col_ptr
-  # @canvas
+  # flush
+  # # @canvas.clear
+  # # @col_height.clear
+  # # @col_width.clear
+  # # @col_ptr = 0
+  # # @row = 0
   # ```
-  # 
-  # And set these attribute to the newly `one_column` method
+  #
+  # Use `flush(true)` will reset the *list* variable too.
+  #
+  # Example:
   # ```
-  # @col_width # => longest str in the list
-  # @row       # => current row height ( list.size )
+  # flush(true)
+  # # @canvas.clear
+  # # @col_height.clear
+  # # @col_width.clear
+  # # @col_ptr = 0
+  # # @row = 0
+  # # @list.clear
   # ```
-  private def flush
-    @col_ptr = 0
-    @col_width.clear
-    @col_width << @list.max_by { |elm| elm.size }.size
+  def flush(all : Bool = false)
     @canvas.clear
-    @row = @list.size
+    @col_height.clear
+    @col_width.clear
+    @col_ptr = 0
+    @row = 0
+    
+    @list.clear if all
+    return
   end
   
   # Rearrange the current column & row due to newly str proceed to the canvas.
@@ -268,29 +272,116 @@ class Grid
     @list.join("\n")
   end
   
+  # Calculate the row & height to the one column sized.
+  #
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1", 
+  #   "str_3", 
+  #   "str_2", 
+  #   "str_4", 
+  #   "str_5"
+  # ]
+  # virtual_one_column # 
+  # ```
   def virtual_one_column
-    @col_ptr = 0
     @canvas.clear
     @col_width.clear
     @col_width << @list.max_by { |elm| elm.size }.size
     @row = @list.size
-    @row_height = [@row]
+    @col_height = [@row]
+    return
   end
   
-  def highest_virtual_row : Int32
-    temp = @row_height.max?
+  # Get the highest of col_height.
+  #
+  # Example:
+  # ```
+  # @col_height = [4, 4, 3]
+  # highest_virtual_row     #   => 4
+  # ```
+  private def highest_virtual_row : Int32
+    temp = @col_height.max?
     temp ? temp : 0
   end
   
-  def virtual_column_width(index : Int32, height : Int32) : Tuple(Array(Int32), Int32)
-    last_row_height = 0
+  # Calculate column width for canvas virtually to the range of data.
+  #
+  # Returning the width of every column in an array, plus the column height of the last column
+  #
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1", 
+  #   "str_30", 
+  #   "str_200", 
+  #   "str_4000", 
+  #   "str_50000"
+  # ]
+  # virtual_column_width(4, 3)      # => { [7, 9], 2 }
+  #
+  # # Virtual column would be like
+  # # str_1   str_4000
+  # # str_30  str_50000
+  # # str_200 
+  # 
+  # virtual_column_width(3, 2)      # => { [6, 7], 1 }
+  # 
+  # # Virtual column would be like
+  # # str_1  str_200
+  # # str_30
+  # ```
+  # 
+  # If virtual_size argument is larger than *list* size, than it will use the *list* size instead.
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1", 
+  #   "str_30", 
+  #   "str_200", 
+  #   "str_4000", 
+  #   "str_50000"
+  # ]
+  #
+  # virtual_column_width(100, 3)      # => { [7, 9], 2 }
+  # 
+  # # Virtual column would be like
+  # # str_1   str_4000
+  # # str_30  str_50000
+  # # str_200 
+  # ```
+  #
+  # Height parameter act same like virtual_size.
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1", 
+  #   "str_30", 
+  #   "str_200", 
+  #   "str_4000", 
+  #   "str_50000"
+  # ]
+  # 
+  # virtual_column_width(4, 100)      # => { [9], 5 }
+  # 
+  # # Virtual column would be like
+  # # str_1
+  # # str_30
+  # # str_200
+  # # str_4000
+  # # str_50000
+  # ```
+  def virtual_column_width(virtual_size : Int32, height : Int32) : Tuple(Array(Int32), Int32)
+    virtual_size = virtual_size > @list.size ? -1 : virtual_size
+    last_col_height = 0
     
-    ary = @list[0..index].each_slice(height).map do |new_col|
-      last_row_height = new_col.size
+    ary = @list[0..virtual_size].each_slice(height).map do |new_col|
+      last_col_height = new_col.size
       new_col.max_by { |elm| elm.size }.size
     end.to_a
     
-    return ary, last_row_height
+    return ary, last_col_height
   end
 end
 
