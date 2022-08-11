@@ -302,8 +302,13 @@ class Grid
   #   "str_2",
   #   "str_4",
   #   "str_5",
+  #   "str_6",
+  #   "str_7",
   # ]
-  # virtual_one_column #
+  # 
+  # virtual_one_column
+  # # @col_width = [5]
+  # # @col_height = [7]
   # ```
   def virtual_one_column
     @canvas.clear
