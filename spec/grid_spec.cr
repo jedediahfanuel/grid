@@ -406,14 +406,32 @@ describe Grid do
   end
 
   describe ".to_s" do
-    str = create_to_string("Rubys Crystals Emeralds Sapphires")
+    str_left = create_to_string("Rubys Crystals Emeralds Sapphires", true, ' ')
 
     it "should return type of String" do
-      typeof(str).should eq(String)
+      typeof(str_left).should eq(String)
     end
 
-    it "should ok" do
-      str.should eq("Rubys    Emeralds \nCrystals Sapphires\n")
+    it "should ok with align_left" do
+      str_left.should eq("Rubys    Emeralds \nCrystals Sapphires\n")
+    end
+    
+    str_left_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", true, '-')
+    
+    it "should ok with align_left with custom delimiter '-" do
+      str_left_delimiter.should eq("Rubys   -Emeralds \nCrystals-Sapphires\n")
+    end
+    
+    str_right = create_to_string("Rubys Crystals Emeralds Sapphires", false, ' ')
+    
+    it "should ok with align_right" do
+      str_right.should eq("   Rubys  Emeralds\nCrystals Sapphires\n")
+    end
+    
+    str_right_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", false, '-')
+    
+    it "should ok with align_right with custom delimiter '-" do
+      str_right_delimiter.should eq("   Rubys- Emeralds\nCrystals-Sapphires\n")
     end
 
     str_empty = create_to_string("")
