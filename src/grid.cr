@@ -1,5 +1,5 @@
 # `Grid` is a string grid formatter library
-class Grid
+struct Grid
   VERSION = "0.1.0"
 
   # Canvas is a variable that holds the cell of each string
@@ -423,7 +423,3 @@ class Grid
   end
 end
 
-grid = Grid.new("Rubys Crystals Emeralds Sapphires")
-grid.virtual_generate
-grid.virtual_to_canvas
-puts grid.to_s
