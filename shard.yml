@@ -2,7 +2,7 @@ name: grid
 version: 0.1.0
 
 description: |
-  A string grid formatter library for crystal programming language
+  A simple string grid formatter library for crystal programming language
 
 authors:
   - Jeddi212 <jedediahf51@gmail.com>
