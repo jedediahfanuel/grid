@@ -35,7 +35,7 @@ Work in progress
 
 - [x] Auto grid
 
-- [/] Direction
+- [ ] Direction
 
    - [x] top-down
    - [ ] left-right
