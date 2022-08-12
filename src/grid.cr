@@ -204,7 +204,7 @@ struct Grid
   # # Rubys    Emeralds
   # # Crystals Sapphires
   # ```
-  def to_s(top_down = true, align_left = true, separator = " ") : String
+  def to_s(top_down = true, align_left = true, separator : Char = ' ') : String
     String.build do |io|
       if top_down
         max_height.times do |row|
