@@ -204,12 +204,14 @@ struct Grid
   # # Rubys    Emeralds
   # # Crystals Sapphires
   # ```
-  def to_s(align_left = true, separator = " ") : String
+  def to_s(top_down = true, align_left = true, separator = " ") : String
     String.build do |io|
-      if align_left
+      if top_down
         max_height.times do |row|
           col_width.each_with_index do |width, col|
-            io << canvas[col][row].ljust(width, ' ') if row < col_height[col]
+            if row < col_height[col]
+              io << (align_left ? canvas[col][row].ljust(width, ' ') : canvas[col][row].rjust(width, ' '))
+            end
             io << separator if col < (col_width.size - 1)
           end
           io << "\n"
