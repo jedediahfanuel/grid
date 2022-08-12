@@ -18,22 +18,36 @@ A simple string grid formatter library for crystal programming language.
 
 ```crystal
 require "grid"
-```
 
-TODO: Write usage instructions here
+grid = Grid.new("Rubys Crystals Emeralds Sapphires")
+grid.virtual_generate(18) # 18 char is the max width of the canvas (not the column)  
+grid.virtual_to_canvas
+grid.to_s(true) # true [default | omittable] == top-down direction | false == left-right direction
+
+# Rubys    Emeralds 
+# Crystals Sapphires
+
+```
 
 ## Development
 
 Work in progress
+
+- [x] Auto grid
+
+- [/] Direction
+
+   - [x] top-down
+   - [ ] left-right
+   
 - [ ] Custom header
-- [ ] Auto grid
+
 - [ ] Manual grid 
 
-      - [ col , row ] 
-      - [ col_width ]
-      - [ elipsis ]
-      - [ pass through ]
-      - [ direction ]
+      - [ ] col & row size
+      - [ ] col width
+      - [ ] elipsis
+      - [ ] pass through
 
 ## Contributing
 
