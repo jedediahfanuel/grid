@@ -29,6 +29,8 @@ grid.to_s(true) # true [default | omittable] == top-down direction | false == le
 
 ```
 
+For detailed api, check [grid docs](https://jeddi212.github.io/grid/).
+
 ## Development
 
 Work in progress
