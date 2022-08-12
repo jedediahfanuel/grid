@@ -406,4 +406,22 @@ describe Grid do
     end
   end
   
+  describe ".to_s" do
+    str = create_to_string("Rubys Crystals Emeralds Sapphires")
+    
+    it "should return type of String" do
+      typeof(str).should eq(String)
+    end
+    
+    it "should ok" do
+      str.should eq("Rubys    Emeralds \nCrystals Sapphires\n")
+    end
+    
+    str_empty = create_to_string("")
+    
+    it "should return empty string if the canvas is empty" do
+      str_empty.should eq("")
+    end
+  end
+  
 end

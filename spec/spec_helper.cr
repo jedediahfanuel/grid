@@ -25,3 +25,10 @@ def create_virtual_generate(str : String) : Grid
   return Grid.new(str)
 end
 
+def create_to_string(str : String)
+  grid = Grid.new(str)
+  grid.virtual_generate(18)
+  grid.virtual_to_canvas
+  grid.to_s(true)
+end
+
