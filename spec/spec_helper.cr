@@ -31,4 +31,3 @@ def create_to_string(str : String)
   grid.virtual_to_canvas
   grid.to_s(true)
 end
-

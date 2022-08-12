@@ -1,14 +1,14 @@
 # `Grid` is a simple string grid formatter library for crystal programming language.
-# 
+#
 # Example:
-#  
+#
 # ```
 # grid = Grid.new("Rubys Crystals Emeralds Sapphires")
-# grid.virtual_generate(18) # 18 char is the max width of the canvas (not the column)  
+# grid.virtual_generate(18) # 18 char is the max width of the canvas (not the column)
 # grid.virtual_to_canvas
 # grid.to_s(true) # true [default | omittable] == top-down direction | false == left-right direction
-# 
-# # Rubys    Emeralds 
+#
+# # Rubys    Emeralds
 # # Crystals Sapphires
 # ```
 struct Grid
@@ -190,18 +190,18 @@ struct Grid
     temp = @col_height.max?
     temp ? temp : 0
   end
-  
+
   # Convert all elements in *canvas* to a single string using `String#build`.
   #
   # Example:
-  #  
+  #
   # ```
   # grid = Grid.new("Rubys Crystals Emeralds Sapphires")
   # grid.virtual_generate
   # grid.virtual_to_canvas
   # grid.to_s
-  # 
-  # # Rubys    Emeralds 
+  #
+  # # Rubys    Emeralds
   # # Crystals Sapphires
   # ```
   def to_s(align_left = true, separator = " ") : String
@@ -447,4 +447,3 @@ struct Grid
     @canvas = @list.each_slice(virtual_row).map { |col| col }.to_a
   end
 end
-
