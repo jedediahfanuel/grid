@@ -4,9 +4,9 @@
 #  
 # ```
 # grid = Grid.new("Rubys Crystals Emeralds Sapphires")
-# grid.virtual_generate(18) # 18 char is the max width of the canvas (not the column)
+# grid.virtual_generate(18) # 18 char is the max width of the canvas (not the column)  
 # grid.virtual_to_canvas
-# grid.to_s
+# grid.to_s(true) # true [default | omittable] == top-down direction | false == left-right direction
 # 
 # # Rubys    Emeralds 
 # # Crystals Sapphires
