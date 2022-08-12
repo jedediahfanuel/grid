@@ -25,9 +25,9 @@ def create_virtual_generate(str : String) : Grid
   return Grid.new(str)
 end
 
-def create_to_string(str : String)
+def create_to_string(str : String, align_left = true, separator = ' ')
   grid = Grid.new(str)
   grid.virtual_generate(18)
   grid.virtual_to_canvas
-  grid.to_s(true)
+  grid.to_s(true, align_left, separator)
 end
