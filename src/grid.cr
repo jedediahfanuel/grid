@@ -81,7 +81,7 @@ class Grid
   #
   # Example:
   # ```
-  # delimiter_count_of(3)   # => 2
+  # delimiter_count_of(3) # => 2
   # ```
   def delimiter_count_of(col_count : Int32) : Int32
     col_count < 1 ? 0 : col_count - 1
@@ -92,7 +92,7 @@ class Grid
   # ```
   # # Say we have a list like this
   # [["a"], ["b"], ["c"]]
-  # delimiter_count         # => 2
+  # delimiter_count # => 2
   # ```
   def delimiter_count : Int32
     col_size = @col_width.size
@@ -103,14 +103,14 @@ class Grid
   # Example:
   # ```
   # # Say we have a list like this
-  # [["a"], ["b"], ["c"]]    # [0..1] ~> [["a"], ["b"]]
-  # delimiter_count(1)      # => 1
+  # [["a"], ["b"], ["c"]] # [0..1] ~> [["a"], ["b"]]
+  # delimiter_count(1)    # => 1
   # ```
   def delimiter_count(i : Int32) : Int32
     col_size = @col_width[0..i].size
     col_size < 1 ? 0 : col_size - 1
   end
-  
+
   # Flush all of the variable.
   #
   # Example:
@@ -177,6 +177,20 @@ class Grid
   def highest_virtual_row : Int32
     temp = @col_height.max?
     temp ? temp : 0
+  end
+
+  def to_s(align_left = true, separator = " ") : String
+    String.build do |io|
+      if align_left
+        max_height.times do |row|
+          col_width.each_with_index do |width, col|
+            io << canvas[col][row].ljust(width, ' ') if row < col_height[col]
+            io << separator if col < (col_width.size - 1)
+          end
+          io << "\n"
+        end
+      end
+    end
   end
 
   # Calculate column width for canvas virtually to the range of data.
@@ -257,7 +271,7 @@ class Grid
 
     return ary, last_col_height
   end
-  
+
   # Calculate the row & height to the one column sized.
   #
   # Example:
@@ -271,7 +285,7 @@ class Grid
   #   "str_6",
   #   "str_7",
   # ]
-  # 
+  #
   # virtual_one_column
   # # @col_width = [5]
   # # @col_height = [7]
@@ -284,33 +298,33 @@ class Grid
     @col_height = [@max_height]
     return
   end
-  
+
   # Generate the virtual canvas based on the current *list* and specified *max width*.
   # The max width default value is 24.
-  # 
+  #
   # Example:
   # ```
   # @canvas = [] of Array(String)
   # @list = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
-  # 
+  #
   # virtual_generate # generate our virtual canvas with default value of @max_width = 24
   #
   # # Then our virtual_canvas are
   # @col_width = [7, 9]
   # @col_height = [3, 2]
-  # 
-  # # str_1   str_4000 
+  #
+  # # str_1   str_4000
   # # str_30  str_50000
   # # str_200
-  # 
+  #
   # virtual_generate(25) # generate our virtual canvas @max_width = 25
-  # 
+  #
   # Then our virtual_canvas are
   # @col_width = [7, 9]
   # @col_height = [3, 2]
-  # 
+  #
   # # str_1  str_200  str_50000
-  # # str_30 str_4000 
+  # # str_30 str_4000
   # ```
   #
   # NOTE: currently only support top-down direction
@@ -348,7 +362,7 @@ class Grid
       end
     end
   end
-  
+
   # Rearrange the virtual canvas due to newly str.
   # It returns `true` if there's a valid re-arrangement.
   # It returns `false` if there's no valid re-arrangement.
@@ -367,7 +381,7 @@ class Grid
 
         if candidate_size <= @max_width
           @max_height = candidate_cols_height
-          
+
           col_count = candidate_cols_width.size
           @col_height = Array(Int32).new(col_count, @max_height)
           @col_height[-1] = last_col_height
@@ -382,30 +396,34 @@ class Grid
 
     return false
   end
-  
+
   # Install the *list* to the *canvas* based on the virtual_canvas.
-  # 
+  #
   # Example:
   # ```
   # @canvas = [] of Array(String)
   # @list = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
-  # 
+  #
   # # Then our virtual_canvas are
   # @col_width = [7, 9]
   # @col_height = [3, 2]
-  # 
+  #
   # # Then we call `virtual_to_canvas`
   # virtual_to_canvas
-  # 
+  #
   # # Our canvas would be like this
   # @canvas = [
-  #   ["str_1", "str_30", "str_200"],  # this is column 1
-  #   ["str_4000", "str_50000"],       # this is column 2
+  #   ["str_1", "str_30", "str_200"], # this is column 1
+  #   ["str_4000", "str_50000"],      # this is column 2
   # ]
   # ```
   def virtual_to_canvas : Array(Array(String))
     virtual_row = highest_virtual_row > 0 ? highest_virtual_row : 1
-    @canvas = @list.each_slice(virtual_row).map{ |col| col }.to_a
+    @canvas = @list.each_slice(virtual_row).map { |col| col }.to_a
   end
 end
 
+grid = Grid.new("Rubys Crystals Emeralds Sapphires")
+grid.virtual_generate
+grid.virtual_to_canvas
+puts grid.to_s
