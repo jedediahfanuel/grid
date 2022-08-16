@@ -189,10 +189,11 @@ struct Grid
   # ```
   def virtual_to_canvas(top_down = true) : Array(Array(String))
     if top_down
-      virtual_row = highest_virtual_row > 0 ? highest_virtual_row : 1
-      @canvas = @list.each_slice(virtual_row).map { |col| col }.to_a
+      virtual_col = highest_virtual_row > 0 ? highest_virtual_row : 1
+      @canvas = @list.each_slice(virtual_col).map { |col| col }.to_a
     else
-      @canvas_lr = @list.each_slice(@col_width_lr.size).map { |row| row }.to_a
+      virtual_row = @col_width_lr.size > 0 ? @col_width_lr.size : 1
+      @canvas_lr = @list.each_slice(virtual_row).map { |row| row }.to_a
     end
   end
 end

@@ -50,6 +50,17 @@ module LeftRight
     return ary
   end
   
+  def virtual_one_column_lr
+    cw = @list.max_of?(&.size)
+    if cw.is_a? Nil
+      @col_width_lr.clear 
+      return
+    end
+    
+    @col_width_lr = [cw]
+    return
+  end
+  
   private def virtual_left_right
     col_count, temp_size = 1, 0
     
@@ -59,7 +70,7 @@ module LeftRight
     end
     
     if col_count < 2
-      virtual_one_column
+      virtual_one_column_lr
       return
     end
     
@@ -69,7 +80,7 @@ module LeftRight
     end
     
     unless final_cols_width
-      virtual_one_column
+      virtual_one_column_lr
       return
     end
     
