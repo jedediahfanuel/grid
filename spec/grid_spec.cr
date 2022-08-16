@@ -90,7 +90,7 @@ describe Grid do
       end
 
       it "should reset the @max_height" do
-        grid.max_height.should eq(0)
+        grid.current_row_size.should eq(0)
       end
 
       it "should reset the @max_width)" do
@@ -119,7 +119,7 @@ describe Grid do
       end
 
       it "should reset the @max_height" do
-        grid.max_height.should eq(0)
+        grid.current_row_size.should eq(0)
       end
 
       it "should reset the @max_width)" do

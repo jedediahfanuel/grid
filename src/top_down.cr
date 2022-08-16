@@ -28,14 +28,14 @@ module TopDown
   # Example:
   # ```
   # @canvas = [
-  #   ["a", "b", "c"], # => column 1 :: has row 3
-  #   ["d", "e"],      # => column 2 :: has row 2
+  #   ["a", "b", "c"], # => column 1 :: has 3 row
+  #   ["d", "e"],      # => column 2 :: has 2 row
   # ]
   #
   # # so the highest row is 3
-  # # and its became the value of @max_height
+  # # and its became the value of @current_row_size
   # ```
-  property max_height = 0
+  property current_row_size = 0
   
   # Count the delimiter of specified column count.
   #
@@ -79,7 +79,7 @@ module TopDown
   # # @canvas.clear
   # # @col_height.clear
   # # @col_width.clear
-  # # @max_height = 0
+  # # @current_row_size = 0
   # # @max_width = 0
   # ```
   #
@@ -91,7 +91,7 @@ module TopDown
   # # @canvas.clear
   # # @col_height.clear
   # # @col_width.clear
-  # # @max_height = 0
+  # # @current_row_size = 0
   # # @max_width = 0
   # # @list.clear
   # ```
@@ -99,7 +99,7 @@ module TopDown
     @canvas.clear
     @col_height.clear
     @col_width.clear
-    @max_height = 0
+    @current_row_size = 0
     @max_width = 0
   
     @list.clear if all
@@ -235,10 +235,10 @@ module TopDown
         candidate_size = candidate_cols_width.sum + delimiter_count_of(candidate_cols_width.size)
   
         if candidate_size <= @max_width
-          @max_height = candidate_cols_height
+          @current_row_size = candidate_cols_height
   
           col_count = candidate_cols_width.size
-          @col_height = Array(Int32).new(col_count, @max_height)
+          @col_height = Array(Int32).new(col_count, @current_row_size)
           @col_height[-1] = last_col_height
   
           @col_width = candidate_cols_width
@@ -263,7 +263,7 @@ module TopDown
         if get_next_width(str) < @max_width
           @col_height << 1
           @col_width << str.size
-          @max_height = highest_virtual_col
+          @current_row_size = highest_virtual_col
         else
           unless virtual_rearrange_top_down(str, i)
             virtual_one_column

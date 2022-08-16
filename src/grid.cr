@@ -73,7 +73,7 @@ struct Grid
   def to_s(top_down = true, align_left = true, separator : Char = ' ') : String
     String.build do |io|
       if top_down
-        max_height.times do |row|
+        current_row_size.times do |row|
           col_width.each_with_index do |width, col|
             if row < col_height[col]
               io << (align_left ? canvas[col][row].ljust(width, ' ') : canvas[col][row].rjust(width, ' '))
@@ -108,8 +108,8 @@ struct Grid
     @canvas.clear
     @col_width.clear
     @col_width << @list.max_by { |elm| elm.size }.size
-    @max_height = @list.size
-    @col_height = [@max_height]
+    @current_row_size = @list.size
+    @col_height = [@current_row_size]
     return
   end
 
