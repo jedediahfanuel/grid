@@ -23,7 +23,7 @@ module TopDown
   # ```
   property col_height = [] of Int32
   
-  # Holds the currently highest column value.
+  # Holds the currently highest column size.
   #
   # Example:
   # ```
@@ -122,9 +122,9 @@ module TopDown
   # Example:
   # ```
   # @col_height = [4, 4, 3]
-  # highest_virtual_col # => 4
+  # highest_virtual_row # => 4
   # ```
-  def highest_virtual_col : Int32
+  def highest_virtual_row : Int32
     temp = @col_height.max?
     temp ? temp : 0
   end
@@ -249,11 +249,11 @@ module TopDown
         return
       end
 
-      if @col_height.empty? || @col_height.last >= highest_virtual_col
+      if @col_height.empty? || @col_height.last >= highest_virtual_row
         if get_next_width(str) < @max_width
           @col_height << 1
           @col_width << str.size
-          @current_row_size = highest_virtual_col
+          @current_row_size = highest_virtual_row
         else
           unless virtual_rearrange_top_down(str, i)
             virtual_one_column

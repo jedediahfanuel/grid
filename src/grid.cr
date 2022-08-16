@@ -92,6 +92,14 @@ struct Grid
           end
           io << "\n"
         end
+      else 
+        @canvas_lr.each do |row|
+          row.each_with_index do |str, i|
+            io << (align_left ? str.ljust(@col_width_lr[i], ' ') : str.rjust(@col_width_lr[i], ' '))
+            io << separator if i < (row.size - 1)
+          end
+          io << "\n"
+        end
       end
     end
   end
@@ -152,11 +160,11 @@ struct Grid
   # ```
   #
   # NOTE: currently only support top-down direction
-  def virtual_generate(max_w = 24)
+  def virtual_generate(max_w = 24, top_down = true)
     flush
     @max_width = max_w
-    
-    virtual_top_down
+  
+    top_down ? virtual_top_down : virtual_left_right
   end
 
   # Install the *list* to the *canvas* based on the virtual_canvas.
@@ -179,8 +187,13 @@ struct Grid
   #   ["str_4000", "str_50000"],      # this is column 2
   # ]
   # ```
-  def virtual_to_canvas : Array(Array(String))
-    virtual_row = highest_virtual_col > 0 ? highest_virtual_col : 1
-    @canvas = @list.each_slice(virtual_row).map { |col| col }.to_a
+  def virtual_to_canvas(top_down = true) : Array(Array(String))
+    if top_down
+      virtual_row = highest_virtual_row > 0 ? highest_virtual_row : 1
+      @canvas = @list.each_slice(virtual_row).map { |col| col }.to_a
+    else
+      @canvas_lr = @list.each_slice(@col_width_lr.size).map { |row| row }.to_a
+    end
   end
 end
+
