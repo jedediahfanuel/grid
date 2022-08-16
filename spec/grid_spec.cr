@@ -90,7 +90,7 @@ describe Grid do
       end
 
       it "should reset the @max_height" do
-        grid.max_height.should eq(0)
+        grid.current_row_size.should eq(0)
       end
 
       it "should reset the @max_width)" do
@@ -119,7 +119,7 @@ describe Grid do
       end
 
       it "should reset the @max_height" do
-        grid.max_height.should eq(0)
+        grid.current_row_size.should eq(0)
       end
 
       it "should reset the @max_width)" do
@@ -406,38 +406,109 @@ describe Grid do
   end
 
   describe ".to_s" do
-    str_left = create_to_string("Rubys Crystals Emeralds Sapphires", true, ' ')
+    context "top-down" do
+      str_left = create_to_string("Rubys Crystals Emeralds Sapphires", true, true, ' ')
 
-    it "should return type of String" do
-      typeof(str_left).should eq(String)
+      it "should return type of String" do
+        typeof(str_left).should eq(String)
+      end
+
+      it "should ok with align_left" do
+        str_left.should eq("Rubys    Emeralds \nCrystals Sapphires\n")
+      end
+
+      str_left_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", true, true, '-')
+
+      it "should ok with align_left with custom delimiter '-'" do
+        str_left_delimiter.should eq("Rubys   -Emeralds \nCrystals-Sapphires\n")
+      end
+
+      str_right = create_to_string("Rubys Crystals Emeralds Sapphires", true, false, ' ')
+
+      it "should ok with align_right" do
+        str_right.should eq("   Rubys  Emeralds\nCrystals Sapphires\n")
+      end
+
+      str_right_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", true, false, '-')
+
+      it "should ok with align_right with custom delimiter '-'" do
+        str_right_delimiter.should eq("   Rubys- Emeralds\nCrystals-Sapphires\n")
+      end
+
+      str_empty = create_to_string("", true)
+
+      it "should return empty string if the canvas is empty" do
+        str_empty.should eq("")
+      end
     end
 
-    it "should ok with align_left" do
-      str_left.should eq("Rubys    Emeralds \nCrystals Sapphires\n")
+    context "left-right" do
+      str_left_lr = create_to_string("Rubys Crystals Emeralds Sapphires", false, true, ' ')
+
+      it "should return type of String" do
+        typeof(str_left_lr).should eq(String)
+      end
+
+      it "should ok with align_left" do
+        str_left_lr.should eq("Rubys    Crystals \nEmeralds Sapphires\n")
+      end
+
+      str_left_lr_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", false, true, '-')
+
+      it "should ok with align_left with custom delimiter '-'" do
+        str_left_lr_delimiter.should eq("Rubys   -Crystals \nEmeralds-Sapphires\n")
+      end
+
+      str_right_lr = create_to_string("Rubys Crystals Emeralds Sapphires", false, false, ' ')
+
+      it "should ok with align_right" do
+        str_right_lr.should eq("   Rubys  Crystals\nEmeralds Sapphires\n")
+      end
+
+      str_right_lr_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", false, false, '-')
+
+      it "should ok with align_right with custom delimiter '-'" do
+        str_right_lr_delimiter.should eq("   Rubys- Crystals\nEmeralds-Sapphires\n")
+      end
+
+      str_empty_lr = create_to_string("", false)
+
+      it "should return empty string if the canvas is empty" do
+        str_empty_lr.should eq("")
+      end
     end
-    
-    str_left_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", true, '-')
-    
-    it "should ok with align_left with custom delimiter '-" do
-      str_left_delimiter.should eq("Rubys   -Emeralds \nCrystals-Sapphires\n")
-    end
-    
-    str_right = create_to_string("Rubys Crystals Emeralds Sapphires", false, ' ')
-    
-    it "should ok with align_right" do
-      str_right.should eq("   Rubys  Emeralds\nCrystals Sapphires\n")
-    end
-    
-    str_right_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", false, '-')
-    
-    it "should ok with align_right with custom delimiter '-" do
-      str_right_delimiter.should eq("   Rubys- Emeralds\nCrystals-Sapphires\n")
+  end
+
+  describe ".virtual_one_column_lr" do
+    grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+    grid.virtual_one_column_lr
+
+    it "non empty @list, @col_width_lr should have size of 1" do
+      grid.col_width_lr.size.should eq(1)
     end
 
-    str_empty = create_to_string("")
+    grid_empty = create_virtual_generate("")
+    grid_empty.virtual_one_column_lr
 
-    it "should return empty string if the canvas is empty" do
-      str_empty.should eq("")
+    it "empty @list, @col_width_lr should have size of 0" do
+      grid_empty.col_width_lr.size.should eq(0)
+    end
+  end
+
+  describe ".virtual_column_width_lr" do
+    grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+
+    it "should pass 1st test" do
+      grid.virtual_column_width_lr(1).should eq([9])
+    end
+    it "should pass 2nd test" do
+      grid.virtual_column_width_lr(2).should eq([8, 9])
+    end
+    it "should pass 3rd test" do
+      grid.virtual_column_width_lr(3).should eq([9, 8, 8])
+    end
+    it "should pass 4th test" do
+      grid.virtual_column_width_lr(4).should eq([5, 8, 8, 9])
     end
   end
 end
