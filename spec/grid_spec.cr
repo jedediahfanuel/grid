@@ -132,11 +132,11 @@ describe Grid do
     end
   end
 
-  describe ".highest_virtual_row" do
+  describe ".highest_virtual_col" do
     (1..5).each do |i|
       grid = create_object_with_row(i)
       it "highest row should be #{i}" do
-        grid.highest_virtual_row.should eq(i)
+        grid.highest_virtual_col.should eq(i)
       end
     end
   end
