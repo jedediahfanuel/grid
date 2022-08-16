@@ -1,7 +1,7 @@
 module LeftRight
   # Canvas is a variable that holds the cell of each string
   property canvas_lr = [] of Array(String)
-  
+
   # Holds curently max width for every column.
   #
   # Example:
@@ -13,7 +13,7 @@ module LeftRight
   # # => 3rd column width is 9 char
   # ```
   property col_width_lr = [] of Int32
-  
+
   # Calculate column width for canvas virtually to the range of data.
   #
   # Returning the width of every column in Array(Int32)
@@ -46,44 +46,44 @@ module LeftRight
         row[i]? ? row[i].size > n ? row[i].size : n : n
       end
     end
-  
+
     return ary
   end
-  
+
   def virtual_one_column_lr
     cw = @list.max_of?(&.size)
     if cw.is_a? Nil
-      @col_width_lr.clear 
+      @col_width_lr.clear
       return
     end
-    
+
     @col_width_lr = [cw]
     return
   end
-  
+
   private def virtual_left_right
     col_count, temp_size = 1, 0
-    
+
     @list.each_with_index do |str, i|
       temp_size += str.size
       break col_count = (i + 1) if (temp_size + delimiter_count_of(i + 1)) >= @max_width
     end
-    
+
     if col_count < 2
       virtual_one_column_lr
       return
     end
-    
+
     final_cols_width = col_count.downto(2).each do |c|
       candidate_cols_width = virtual_column_width_lr(c)
       break candidate_cols_width if (candidate_cols_width.sum(0) + delimiter_count_of(c)) <= @max_width
     end
-    
+
     unless final_cols_width
       virtual_one_column_lr
       return
     end
-    
+
     @col_width_lr = final_cols_width
   end
 end

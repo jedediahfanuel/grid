@@ -92,7 +92,7 @@ struct Grid
           end
           io << "\n"
         end
-      else 
+      else
         @canvas_lr.each do |row|
           row.each_with_index do |str, i|
             io << (align_left ? str.ljust(@col_width_lr[i], ' ') : str.rjust(@col_width_lr[i], ' '))
@@ -163,7 +163,7 @@ struct Grid
   def virtual_generate(max_w = 24, top_down = true)
     flush
     @max_width = max_w
-  
+
     top_down ? virtual_top_down : virtual_left_right
   end
 
@@ -197,4 +197,3 @@ struct Grid
     end
   end
 end
-
