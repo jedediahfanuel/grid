@@ -57,6 +57,16 @@ struct Grid
   include LeftRight
   include TopDown
 
+  # Count the delimiter of specified column count.
+  #
+  # Example:
+  # ```
+  # delimiter_count_of(3) # => 2
+  # ```
+  def delimiter_count_of(col_count : Int32) : Int32
+    col_count < 1 ? 0 : col_count - 1
+  end
+
   # Convert all elements in *canvas* to a single string using `String#build`.
   #
   # Example:

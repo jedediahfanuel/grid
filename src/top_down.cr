@@ -37,16 +37,6 @@ module TopDown
   # ```
   property current_row_size = 0
   
-  # Count the delimiter of specified column count.
-  #
-  # Example:
-  # ```
-  # delimiter_count_of(3) # => 2
-  # ```
-  def delimiter_count_of(col_count : Int32) : Int32
-    col_count < 1 ? 0 : col_count - 1
-  end
-  
   # Count the delimiter of the whole column.
   # Example:
   # ```
