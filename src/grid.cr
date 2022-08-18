@@ -17,9 +17,6 @@ require "./left_right"
 struct Grid
   VERSION = "0.1.0"
 
-  # Canvas is a variable that holds the cell of each string
-  property canvas = [] of Array(String)
-
   # Holds the max width of the canvas.
   # Its defined by the user.
   # Default value is `24`.
@@ -83,12 +80,11 @@ struct Grid
   def to_s(top_down = true, align_left = true, separator : Char = ' ') : String
     String.build do |io|
       if top_down
-        current_row_size.times do |row|
-          col_width.each_with_index do |width, col|
-            if row < col_height[col]
-              io << (align_left ? canvas[col][row].ljust(width, ' ') : canvas[col][row].rjust(width, ' '))
-            end
-            io << separator if col < (col_width.size - 1)
+        @canvas_td.first.size.times do |row|
+          @col_width_td.each_with_index do |w, col|
+            next unless @canvas_td[col][row]?
+            io << (align_left ? @canvas_td[col][row].ljust(w, ' ') : @canvas_td[col][row].rjust(w, ' '))
+            io << separator if col < (@col_width_td.size - 1)
           end
           io << "\n"
         end
@@ -102,33 +98,6 @@ struct Grid
         end
       end
     end
-  end
-
-  # Calculate the row & height to the one column sized.
-  #
-  # Example:
-  # ```
-  # @list = [
-  #   "str_1",
-  #   "str_3",
-  #   "str_2",
-  #   "str_4",
-  #   "str_5",
-  #   "str_6",
-  #   "str_7",
-  # ]
-  #
-  # virtual_one_column
-  # # @col_width = [5]
-  # # @col_height = [7]
-  # ```
-  def virtual_one_column
-    @canvas.clear
-    @col_width.clear
-    @col_width << @list.max_by { |elm| elm.size }.size
-    @current_row_size = @list.size
-    @col_height = [@current_row_size]
-    return
   end
 
   # Generate the virtual canvas based on the current *list* and specified *max width*.
@@ -158,12 +127,8 @@ struct Grid
   # # str_1  str_200  str_50000
   # # str_30 str_4000
   # ```
-  #
-  # NOTE: currently only support top-down direction
   def virtual_generate(max_w = 24, top_down = true)
-    flush
     @max_width = max_w
-
     top_down ? virtual_top_down : virtual_left_right
   end
 
@@ -189,11 +154,11 @@ struct Grid
   # ```
   def virtual_to_canvas(top_down = true) : Array(Array(String))
     if top_down
-      virtual_col = highest_virtual_row > 0 ? highest_virtual_row : 1
-      @canvas = @list.each_slice(virtual_col).map { |col| col }.to_a
+      @canvas_td
     else
       virtual_row = @col_width_lr.size > 0 ? @col_width_lr.size : 1
       @canvas_lr = @list.each_slice(virtual_row).map { |row| row }.to_a
     end
   end
 end
+
