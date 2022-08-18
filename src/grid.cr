@@ -20,7 +20,7 @@ require "./left_right"
 # # Emeralds Sapphires
 # # a        b
 # 
-# grid.to_s(true, false, '|') # get the string format (true) in top-down direction
+# grid.to_s(true, false, '|') # get the string format (true) in top-down direction (false) align-right and custom separator '|'
 # #    Rubys|Sapphires
 # # Crystals|        a
 # # Emeralds|        b
@@ -143,9 +143,9 @@ struct Grid
   # #        a         b
   # 
   # grid.to_s(false, false, '|')
-  #    Rubys| Crystals
-  # Emeralds|Sapphires
-  #        a|        b
+  # #    Rubys| Crystals
+  # # Emeralds|Sapphires
+  # #        a|        b
   # ```
   def to_s(top_down = true, align_left = true, separator : Char = ' ') : String
     String.build do |io|
