@@ -21,7 +21,6 @@ require "./left_right"
 # # a        b
 # 
 # grid.to_s(true, false, '|') # get the string format (true) in top-down direction
-# grid.to_s(true, false)
 # #    Rubys|Sapphires
 # # Crystals|        a
 # # Emeralds|        b
