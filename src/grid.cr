@@ -127,11 +127,7 @@ struct Grid
   # # str_1  str_200  str_50000
   # # str_30 str_4000
   # ```
-  def virtual_generate(max_w = 24, top_down = true)
-    @max_width = max_w
-    top_down ? virtual_top_down : virtual_left_right
-  end
-
+  #
   # Install the *list* to the *canvas* based on the virtual_canvas.
   #
   # Example:
@@ -152,13 +148,18 @@ struct Grid
   #   ["str_4000", "str_50000"],      # this is column 2
   # ]
   # ```
-  def virtual_to_canvas(top_down = true) : Array(Array(String))
-    if top_down
-      @canvas_td
-    else
-      virtual_row = @col_width_lr.size > 0 ? @col_width_lr.size : 1
-      @canvas_lr = @list.each_slice(virtual_row).map { |row| row }.to_a
-    end
+  def virtual_generate(max_w = 24, top_down = true)
+    @max_width = max_w
+    top_down ? virtual_top_down : virtual_left_right
   end
 end
 
+grid = Grid.new("Rubys Crystals Emeralds Saphhires a b c d e f 99999999 g")
+puts grid.virtual_generate(18, true)
+puts grid.to_s(true)
+
+puts ""
+
+puts grid.virtual_generate(18, false)
+puts grid.col_width_lr
+puts grid.to_s(false)

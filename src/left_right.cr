@@ -51,14 +51,9 @@ module LeftRight
   end
 
   def virtual_one_column_lr
-    cw = @list.max_of?(&.size)
-    if cw.is_a? Nil
-      @col_width_lr.clear
-      return
-    end
-
-    @col_width_lr = [cw]
-    return
+    @col_width_lr = [@list.max_by { |elm| elm.size }.size]
+    @canvas_lr.clear
+    @canvas_lr = @list.map { |row| [row] }
   end
 
   private def virtual_left_right
@@ -70,8 +65,7 @@ module LeftRight
     end
 
     if col_count < 2
-      virtual_one_column_lr
-      return
+      return virtual_one_column_lr
     end
 
     final_cols_width = col_count.downto(2).each do |c|
@@ -80,10 +74,10 @@ module LeftRight
     end
 
     unless final_cols_width
-      virtual_one_column_lr
-      return
+      return virtual_one_column_lr
     end
 
     @col_width_lr = final_cols_width
+    @canvas_lr = @list.each_slice(@col_width_lr.size).map { |row| row }.to_a
   end
 end

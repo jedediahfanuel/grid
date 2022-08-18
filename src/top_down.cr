@@ -43,7 +43,7 @@ module TopDown
   def virtual_column_width_td(col_size : Int32) : Array(Int32)
     ary = [] of Int32
     @canvas_td.clear
-    
+
     @list.each_slice(col_size) do |col|
       @canvas_td << col
       ary << col.max_by { |elm| elm.size }.size
@@ -53,21 +53,19 @@ module TopDown
   end
 
   def virtual_one_column_td
+    @col_width_td = [@list.max_by { |elm| elm.size }.size]
     @canvas_td.clear
     @canvas_td << @list
   end
 
   private def virtual_top_down
-    slice_size = 1
-    
     final_cols_width = 1.upto(@list.size).each do |c|
       candidate_cols_width = virtual_column_width_td(c)
       if (candidate_cols_width.sum(0) + delimiter_count_of(candidate_cols_width.size)) <= @max_width
-        slice_size = c
         break candidate_cols_width
       end
     end
-    
+
     unless final_cols_width
       return virtual_one_column_td
     end
