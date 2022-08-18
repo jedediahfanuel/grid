@@ -143,9 +143,9 @@ struct Grid
   # #        a         b
   # 
   # grid.to_s(false, false, '|')
-  #    Rubys| Crystals
-  # Emeralds|Sapphires
-  #        a|        b
+  # #    Rubys| Crystals
+  # # Emeralds|Sapphires
+  # #        a|        b
   # ```
   def to_s(top_down = true, align_left = true, separator : Char = ' ') : String
     String.build do |io|
