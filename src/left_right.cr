@@ -1,12 +1,24 @@
 module LeftRight
-  # Canvas is a variable that holds the cell of each string
+  # Canvas is a variable that holds the cell of each string in grid format.
+  # In @canvas_ld, each element in the array is representing a row.
+  # 
+  # Example:
+  # ```
+  # @canvas_lr = [["Rubys", "Crystals"], ["Emeralds", "Sapphires"], ["a", "b"]]
+  #
+  # # It is Left-Right
+  # # Rubys    Crystals 
+  # # Emeralds Sapphires
+  # # a        b  
+  # ```
   property canvas_lr = [] of Array(String)
 
   # Holds curently max width for every column.
   #
   # Example:
   # ```
-  # @col_width_lr = [6, 7, 9]
+  # @canvas_lr = [["Rubys", "Crystals"], ["Emeralds", "Sapphires"], ["a", "b"]]
+  # @col_width_lr = [8, 9]
   #
   # # => 1st column width is 6 char
   # # => 2nd column width is 7 char
@@ -14,9 +26,9 @@ module LeftRight
   # ```
   property col_width_lr = [] of Int32
 
-  # Calculate column width for canvas virtually to the range of data.
+  # Calculate each column width for canvas with virtually row item of *row_size*.
   #
-  # Returning the width of every column in Array(Int32)
+  # Returning the width of every column in type Array(Int32)
   #
   # Example:
   # ```
@@ -30,7 +42,7 @@ module LeftRight
   # virtual_column_width_lr(3) # => [8, 9, 7]
   #
   # # Virtual column would be like
-  # # str_1    str_30     str_200
+  # # str_1    str_30    str_200
   # # str_4000 str_50000
   #
   # virtual_column_width_lr(2) # => [9, 8]
@@ -40,8 +52,8 @@ module LeftRight
   # # str_200   str_4000
   # # str_50000
   # ```
-  def virtual_column_width_lr(virtual_column : Int32) : Array(Int32)
-    ary = @list.each_slice(virtual_column).reduce(Array(Int32).new(virtual_column, 0)) do |memo, row|
+  def virtual_column_width_lr(row_size : Int32) : Array(Int32)
+    ary = @list.each_slice(row_size).reduce(Array(Int32).new(row_size, 0)) do |memo, row|
       memo.map_with_index do |n, i|
         row[i]? ? row[i].size > n ? row[i].size : n : n
       end
@@ -50,13 +62,30 @@ module LeftRight
     return ary
   end
 
-  def virtual_one_column_lr
-    @col_width_lr = [@list.max_by { |elm| elm.size }.size]
+  # Return canvas with the size of one column.
+  # Its set @canvas_lr and calculate the @col_width_lr
+  # 
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1",
+  #   "str_30",
+  #   "str_200",
+  #   "str_4000",
+  #   "str_50000",
+  # ]
+  # virtual_one_column_lr # => [["str_1"], ["str_30"], ["str_200"], ["str_4000"], ["str_50000"]]
+  # ```
+  def virtual_one_column_lr : Array(Array(String))
+    cw = @list.max_of?(&.size)
+    @col_width_lr = cw ? [cw] : @col_width_lr.clear
+
     @canvas_lr.clear
     @canvas_lr = @list.map { |row| [row] }
   end
 
-  private def virtual_left_right
+  private def virtual_left_right : Array(Array(String))
+    return @canvas_lr if @list.empty?
     col_count, temp_size = 1, 0
 
     @list.each_with_index do |str, i|
