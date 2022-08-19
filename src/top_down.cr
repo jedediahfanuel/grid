@@ -66,7 +66,7 @@ module TopDown
 
   # Return canvas with the size of one column.
   # Its set @canvas_td and calculate the @col_width_td
-  # 
+  #
   # Example:
   # ```
   # @list = [
@@ -91,7 +91,7 @@ module TopDown
     
     final_cols_width = 1.upto(@list.size).each do |c|
       candidate_cols_width = virtual_column_width_td(c)
-      if (candidate_cols_width.sum(0) + delimiter_count_of(candidate_cols_width.size)) <= @max_width
+      if (candidate_cols_width.sum(0) + (delimiter_count_of(candidate_cols_width.size) * @separator.size)) <= @max_width
         break candidate_cols_width
       end
     end

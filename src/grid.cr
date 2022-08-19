@@ -7,20 +7,22 @@ require "./left_right"
 #
 # ```
 # grid = Grid.new("Rubys Crystals Emeralds Sapphires a b") # Create a new Grid instance
-# 
+#
 # grid.virtual_generate(18, true) # generate top-down grid with 18 char as max canvas width
 # grid.to_s(true) # get the string format (true) in top-down direction
 # # Rubys    Sapphires
 # # Crystals a        
 # # Emeralds b        
-# 
+#
 # grid.virtual_generate(18, false) # generate left-right grid with 18 char as max canvas width
 # grid.to_s(false) # get the string format (false) in left-right direction
 # # Rubys    Crystals 
 # # Emeralds Sapphires
 # # a        b
-# 
-# grid.to_s(true, false, '|') # get the string format (true) in top-down direction
+#
+# grid = Grid.new("Rubys Crystals Emeralds Sapphires a b", "|") # Create a new Grid instance with custom separator
+# grid.virtual_generate(18, true) # generate left-right grid with 18 char as max canvas width
+# grid.to_s(true, false) # get the string format (true) in top-down direction (false) align-right
 # #    Rubys|Sapphires
 # # Crystals|        a
 # # Emeralds|        b
@@ -64,6 +66,10 @@ struct Grid
   # ```
   def list=(@list : Array(String))
   end
+  
+  # Holds the separator specified by the user.
+  # Default " " (a single space)
+  getter separator = " "
 
   # Initialize grid *list* with type of `Array(String)` as a input parameter.
   # Example:
@@ -71,9 +77,9 @@ struct Grid
   # ```
   # grid = Grid.new(["Ruby", "Crystal", "Emerald", "Sapphire"])
   # grid = Grid.new() # produce empty string
-  # grid = Grid.new() # produce empty list
+  # grid = Grid.new(["Ruby", "Crystal", "Emerald", "Sapphire"], " | ") # with custom separator
   # ```
-  def initialize(@list : Array(String))
+  def initialize(@list : Array(String), @separator = " ")
   end
 
   # Initialize grid *list* with type of `String` as a input parameter.
@@ -82,8 +88,9 @@ struct Grid
   # ```
   # grid = Grid.new("Ruby Crystal Emerald Sapphire")
   # grid = Grid.new() # produce empty list
+  # grid = Grid.new("Ruby Crystal Emerald Sapphire", " | ") # with custom separator
   # ```
-  def initialize(str = "")
+  def initialize(str = "", @separator = " ")
     @list = str.strip.split
   end
 
@@ -103,14 +110,14 @@ struct Grid
 
   # Convert all elements in *canvas* to a single string using `String#build`.
   # The first parameter *top_down* default is true.
-  # The second parameter *align_left* default is true
-  # The third parameter *separator* default is ' ' (single space)
+  # The second parameter *align_left* default is true.
+  # The third parameter *separator* default is ' ' (single space) || it follows the separator specified from `virtual_generate`.
   #
   # Example:
   #
   # ```
   # grid = Grid.new("Rubys Crystals Emeralds Sapphires a b") # Create a new Grid instance
-  # 
+  #
   # grid.virtual_generate(18, true) # generate top-down grid with 18 char as max canvas width
   # # => [["Rubys", "Crystals", "Emeralds"], ["Sapphires", "a", "b"]]
   #
@@ -123,31 +130,41 @@ struct Grid
   # #    Rubys Sapphires
   # # Crystals         a
   # # Emeralds         b
-  # 
-  # grid.to_s(true, true, '|')
-  # # Rubys   |Sapphires
-  # # Crystals|a        
-  # # Emeralds|b        
-  # 
+  #
   # grid.virtual_generate(18, false) # generate left-right grid with 18 char as max canvas width
   # # => [["Rubys", "Crystals"], ["Emeralds", "Sapphires"], ["a", "b"]]
-  # 
+  #
   # grid.to_s(false) # get the string format (false) in left-right direction
   # # Rubys    Crystals 
   # # Emeralds Sapphires
   # # a        b
-  # 
+  #
   # grid.to_s(false, false)
   # #    Rubys  Crystals
   # # Emeralds Sapphires
   # #        a         b
-  # 
-  # grid.to_s(false, false, '|')
-  #    Rubys| Crystals
-  # Emeralds|Sapphires
-  #        a|        b
+  #
+  # Let's see another example for custom separator.
   # ```
-  def to_s(top_down = true, align_left = true, separator : Char = ' ') : String
+  # grid = Grid.new("Rubys Crystals Emeralds Sapphires a b", " | ")
+  # grid.virtual_generate(20, true)
+  # grid.to_s(true, false)
+  # #    Rubys | Sapphires
+  # # Crystals |         a
+  # # Emeralds |         b
+  #
+  # grid.to_s(true, false, "---")
+  # #    Rubys---Sapphires
+  # # Crystals---        a
+  # # Emeralds---        b
+  #
+  # grid.to_s(true, false, "........") # It works even the separator exceed virtual separator size
+  # #    Rubys...Sapphires
+  # # Crystals...        a
+  # # Emeralds...        b
+  # ```
+  def to_s(top_down = true, align_left = true, sep = @separator) : String
+    sep = sep[0..(@separator.size-1)] if @separator.size < sep.size
     String.build do |io|
       if top_down
         return "" if @canvas_td.empty?
@@ -155,7 +172,7 @@ struct Grid
           @col_width_td.each_with_index do |w, col|
             next unless @canvas_td[col][row]?
             io << (align_left ? @canvas_td[col][row].ljust(w, ' ') : @canvas_td[col][row].rjust(w, ' '))
-            io << separator if col < (@col_width_td.size - 1)
+            io << sep if col < (@col_width_td.size - 1)
           end
           io << "\n"
         end
@@ -164,7 +181,7 @@ struct Grid
         @canvas_lr.each do |row|
           row.each_with_index do |str, i|
             io << (align_left ? str.ljust(@col_width_lr[i], ' ') : str.rjust(@col_width_lr[i], ' '))
-            io << separator if i < (row.size - 1)
+            io << sep if i < (row.size - 1)
           end
           io << "\n"
         end
