@@ -162,6 +162,7 @@ struct Grid
   # #    Rubys  Crystals
   # # Emeralds Sapphires
   # #        a         b
+  # ```
   #
   # Let's see another example for custom separator.
   # ```
