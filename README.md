@@ -21,19 +21,21 @@ require "grid"
 
 grid = Grid.new("Rubys Crystals Emeralds Sapphires a b") # Create a new Grid instance
 
-grid.virtual_generate(18, true) # generate top-down grid with 18 char as max canvas width
+grid.auto(18, true) # generate top-down grid with 18 char as max canvas width
 grid.to_s(true) # get the string format (true) in top-down direction
 # Rubys    Sapphires
 # Crystals a        
 # Emeralds b        
 
-grid.virtual_generate(18, false) # generate left-right grid with 18 char as max canvas width
+grid.auto(18, false) # generate left-right grid with 18 char as max canvas width
 grid.to_s(false) # get the string format (false) in left-right direction
 # Rubys    Crystals 
 # Emeralds Sapphires
 # a        b
 
-grid.to_s(true, false, '|') # get the string format (true) in top-down direction
+grid = Grid.new("Rubys Crystals Emeralds Sapphires a b", "|") # Create a new Grid instance with custom separator
+grid.auto(18, true) # generate top-down grid with 18 char as max canvas width
+grid.to_s(true, false) # get the string format (true) in top-down direction
 #    Rubys|Sapphires
 # Crystals|        a
 # Emeralds|        b

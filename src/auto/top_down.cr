@@ -11,7 +11,7 @@ module TopDown
   # # Crystals a        
   # # Emeralds b        
   # ```
-  property canvas_td = [] of Array(String)
+  property canvas_td : Array(Array(String)) = [] of Array(String)
 
   # Holds curently max width for every column.
   #
@@ -24,7 +24,29 @@ module TopDown
   # # => 2nd column width is 7 char
   # # => 3rd column width is 9 char
   # ```
-  property col_width_td = [] of Int32
+  property col_width_td : Array(Int32) = [] of Int32
+
+  # Return canvas with the size of one column.
+  # Its set @canvas_td and calculate the @col_width_td
+  #
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1",
+  #   "str_30",
+  #   "str_200",
+  #   "str_4000",
+  #   "str_50000",
+  # ]
+  # one_column_td # => [["str_1", "str_30", "str_200", "str_4000", "str_50000"]]
+  # ```
+  def one_column_td : Array(Array(String))
+    cw = @list.max_of?(&.size)
+    @col_width_td = cw ? [cw] : @col_width_td.clear
+    
+    @canvas_td.clear
+    @canvas_td << @list
+  end
 
   # Calculate each column width for canvas with virtually col item of *col_size*.
   #
@@ -64,28 +86,6 @@ module TopDown
     return ary
   end
 
-  # Return canvas with the size of one column.
-  # Its set @canvas_td and calculate the @col_width_td
-  #
-  # Example:
-  # ```
-  # @list = [
-  #   "str_1",
-  #   "str_30",
-  #   "str_200",
-  #   "str_4000",
-  #   "str_50000",
-  # ]
-  # virtual_one_column_td # => [["str_1", "str_30", "str_200", "str_4000", "str_50000"]]
-  # ```
-  def virtual_one_column_td : Array(Array(String))
-    cw = @list.max_of?(&.size)
-    @col_width_td = cw ? [cw] : @col_width_td.clear
-    
-    @canvas_td.clear
-    @canvas_td << @list
-  end
-
   private def virtual_top_down : Array(Array(String))
     return @canvas_td if @list.empty?
     
@@ -97,7 +97,7 @@ module TopDown
     end
 
     unless final_cols_width
-      return virtual_one_column_td
+      return one_column_td
     end
 
     @col_width_td = final_cols_width

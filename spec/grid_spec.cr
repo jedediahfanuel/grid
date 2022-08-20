@@ -17,498 +17,288 @@ describe Grid do
       from_ar_string = Grid.new(["Ruby", "Crystal", "Emerald", "Sapphire"])
       from_ar_string.list.should eq(from_string.list)
     end
+    
+    it "should initialize new Grid class from String with custom separator" do
+      from_string = Grid.new("Ruby Crystal Emerald Sapphire", " | ")
+      from_string.list.should eq(["Ruby", "Crystal", "Emerald", "Sapphire"])
+      from_string.separator.should eq(" | ")
+    end
+    
+    it "should initialize new Grid class from Array(String) with custom separator" do
+      from_ar_string = Grid.new(["Ruby", "Crystal", "Emerald", "Sapphire"], " | ")
+      from_ar_string.list.should eq(["Ruby", "Crystal", "Emerald", "Sapphire"])
+      from_ar_string.separator.should eq(" | ")
+    end
   end
 
   describe ".delimiter_count_of" do
-    grid = create_filled_object
+    grid = create_empty_grid
 
     it "0 columns should equal 0 delimiter" do
       grid.delimiter_count_of(0).should eq(0)
     end
 
-    (1..5).each do |i|
+    (1..3).each do |i|
       it "#{i} columns should equal #{i - 1} delimiter" do
         grid.delimiter_count_of(i).should eq(i - 1)
       end
     end
   end
-
-  describe ".delimiter_count" do
-    it "0 columns should equal 0 delimiter" do
-      grid = create_object_with_col(0)
-      grid.delimiter_count.should eq(0)
-    end
-
-    (1..5).each do |i|
-      it "#{i} columns should equal #{i - 1} delimiter" do
-        grid = create_object_with_col(i)
-        grid.delimiter_count.should eq(i - 1)
-      end
-    end
-  end
-
-  describe ".delimiter_count" do
-    context "zero column" do
-      it "0 columns should equal 0 delimiter" do
-        grid = create_object_with_col(0)
-        grid.delimiter_count(0).should eq(0)
-      end
-    end
-
-    context "normal column" do
-      grid = create_object_with_col(11)
-      (1..5).each do |i|
-        it "#{i + 1} columns should equal #{i} delimiter" do
-          grid.delimiter_count(i).should eq(i)
+  
+  describe ".auto" do
+    context "top-down" do
+      context "@list has item(s)" do
+        grid = create_auto_top_down("Rubys Crystals Emeralds Sapphires a b")
+        
+        it "canvas_td should not empty" do
+          grid.canvas_td.should eq([["Rubys", "Crystals", "Emeralds"], ["Sapphires", "a", "b"]])
+        end
+        
+        it "canvas_lr should empty" do
+          grid.canvas_lr.empty?.should be_true
         end
       end
-    end
-
-    context "over-range column should equal largest column exist" do
-      it "[100] column == [5] == 4 delimiter" do
-        grid = create_object_with_col(5)
-        grid.delimiter_count(100).should eq(4)
-      end
-    end
-  end
-
-  describe ".flush" do
-    context "all = false" do
-      grid = create_filled_object
-      grid.flush
-
-      it "should clear the @canvas" do
-        grid.canvas.should eq([] of Array(String))
-      end
-
-      it "should clear the @col_width" do
-        grid.col_width.should eq([] of Int32)
-      end
-
-      it "should clear the @col_height" do
-        grid.col_height.should eq([] of Int32)
-      end
-
-      it "should reset the @max_height" do
-        grid.current_row_size.should eq(0)
-      end
-
-      it "should reset the @max_width)" do
-        grid.max_width.should eq(0)
-      end
-
-      it "@list should save" do
-        grid.list.any?.should eq(true)
-      end
-    end
-
-    context "all = true" do
-      grid = create_filled_object
-      grid.flush(true)
-
-      it "should clear the @canvas" do
-        grid.canvas.should eq([] of Array(String))
-      end
-
-      it "should clear the @col_width" do
-        grid.col_width.should eq([] of Int32)
-      end
-
-      it "should clear the @col_height" do
-        grid.col_height.should eq([] of Int32)
-      end
-
-      it "should reset the @max_height" do
-        grid.current_row_size.should eq(0)
-      end
-
-      it "should reset the @max_width)" do
-        grid.max_width.should eq(0)
-      end
-
-      it "should clear the @list" do
-        grid.list.should eq([] of String)
-      end
-    end
-  end
-
-  describe ".highest_virtual_row" do
-    (1..5).each do |i|
-      grid = create_object_with_row(i)
-      it "highest row should be #{i}" do
-        grid.highest_virtual_row.should eq(i)
-      end
-    end
-  end
-
-  describe ".virtual_one_column" do
-    grid = Grid.new("Crystal Ruby Emerald Sapphire")
-    grid.virtual_one_column
-
-    it "should resulting one virtual column" do
-      grid.col_width.size.should eq(1)
-    end
-
-    it "should resulting one virtual column" do
-      grid.col_height.size.should eq(1)
-    end
-
-    it "canvas should equal to 1 column" do
-      grid.virtual_to_canvas.size.should eq(1)
-    end
-
-    it "canvas column should equal to @list size" do
-      grid.virtual_to_canvas.last.size.should eq(grid.list.size)
-    end
-  end
-
-  describe ".virtual_column_width" do
-    grid = Grid.new("str_1 str_20 str_300 str_4000 str_50000")
-
-    context "normal condition" do
-      it "should be one column" do
-        ary, last_col_height = grid.virtual_column_width(2, grid.list.size)
-        ary.size.should eq(1)
-        ary.should eq([7])
-        last_col_height.should eq(3)
-      end
-
-      it "should be two column" do
-        ary, last_col_height = grid.virtual_column_width(2, 2)
-        ary.size.should eq(2)
-        ary.should eq([6, 7])
-        last_col_height.should eq(3 % 2)
-      end
-
-      it "should be the largest column possible" do
-        ary, last_col_height = grid.virtual_column_width(grid.list.size, 1)
-        ary.size.should eq(grid.list.size)
-        ary.should eq([5, 6, 7, 8, 9])
-        last_col_height.should eq(1)
-      end
-    end
-
-    context "over-range" do
-      it "virtual_index should act as all data" do
-        ary, last_col_height = grid.virtual_column_width(4, grid.list.size)
-        ary.size.should eq(1)
-        ary.should eq([9])
-        last_col_height.should eq(5)
-
-        ary_over, last_col_height_over = grid.virtual_column_width(100, grid.list.size)
-        ary_over.size.should eq(1)
-        ary_over.should eq([9])
-        last_col_height_over.should eq(5)
-
-        ary.size.should eq(ary_over.size)
-        last_col_height.should eq(last_col_height_over)
-      end
-
-      it "virtual_row should act as one column" do
-        ary, last_col_height = grid.virtual_column_width(4, grid.list.size)
-        ary.size.should eq(1)
-        ary.should eq([9])
-        last_col_height.should eq(5)
-
-        ary_over, last_col_height_over = grid.virtual_column_width(4, 100)
-        ary_over.size.should eq(1)
-        ary_over.should eq([9])
-        last_col_height_over.should eq(5)
-
-        ary.size.should eq(ary_over.size)
-        last_col_height.should eq(last_col_height_over)
-      end
-    end
-  end
-
-  describe ".virtual_generate" do
-    context "@list has item(s)" do
-      it "@canvas should be still empty" do
-        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
-        grid.virtual_generate(18)
-        grid.canvas.empty?.should eq(true)
-      end
-
-      it "@col_height should have any" do
-        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
-        grid.virtual_generate(18)
-        grid.col_height.any?.should eq(true)
-      end
-
-      it "@col_width should have any" do
-        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
-        grid.virtual_generate(18)
-        grid.col_width.any?.should eq(true)
-      end
-
-      context "correctness check" do
-        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
-        it "1st condition" do
-          grid.virtual_generate(18)
-          grid.col_height.should eq([2, 2])
-          grid.col_width.should eq([8, 9])
+      
+      context "with custom separator" do
+        grid = create_auto_top_down_with_custom_sep("Rubys Crystals Emeralds Sapphires a b", " | ")
+        
+        it "canvas_td should be 4 : 2" do
+          grid.auto(18, true)
+          grid.canvas_td.should eq([["Rubys", "Crystals", "Emeralds", "Sapphires"], ["a", "b"]])
         end
-
-        it "2nd condition" do
-          grid.virtual_generate(17)
-          grid.col_height.should eq([4])
-          grid.col_width.should eq([9])
+        
+        it "canvas_td should be 3 : 3" do
+          grid.auto(20, true)
+          grid.canvas_td.should eq([["Rubys", "Crystals", "Emeralds"], ["Sapphires", "a", "b"]])
         end
-
-        it "3rd condition" do
-          grid.virtual_generate(35)
-          grid.col_height.should eq([1, 1, 1, 1])
-          grid.col_width.should eq([5, 8, 8, 9])
+        
+        it "canvas_lr should empty" do
+          grid.canvas_lr.empty?.should be_true
         end
       end
-
-      context "2nd correctness check" do
-        grid = create_virtual_generate("a b c d e f g h j k l m n")
-
-        it "1st condition" do
-          grid.virtual_generate(100)
-          grid.col_height.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
-          grid.col_width.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
-        end
-
-        it "2nd condition" do
-          grid.virtual_generate(0)
-          grid.col_height.should eq([13])
-          grid.col_width.should eq([1])
-        end
-
-        it "3rd condition" do
-          grid.virtual_generate(3)
-          grid.col_height.should eq([7, 6])
-          grid.col_width.should eq([1, 1])
-        end
+      
+      it "@list has no item(s)" do
+        grid = create_auto_top_down("")
+        grid.canvas_td.should eq([] of Array(String))
       end
     end
-
-    context "@list has no item" do
-      grid = Grid.new("")
-      grid.virtual_generate
-
-      it "@canvas should be still empty" do
-        grid.canvas.empty?.should eq(true)
-      end
-
-      it "@col_height should have any" do
-        grid.col_height.empty?.should eq(true)
-      end
-
-      it "@col_width should have any" do
-        grid.col_width.empty?.should eq(true)
-      end
-    end
-  end
-
-  describe ".virtual_to_canvas" do
-    context "@list has item(s)" do
-      it "@canvas should not be still empty" do
-        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
-        grid.virtual_generate(18)
-        grid.virtual_to_canvas
-        grid.canvas.empty?.should eq(false)
-      end
-
-      context "correctness check" do
-        grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
-        it "1st condition" do
-          grid.virtual_generate(18)
-          grid.col_height.should eq([2, 2])
-          grid.col_width.should eq([8, 9])
-          grid.virtual_to_canvas
-          grid.canvas.should eq([["Rubys", "Crystals"], ["Emeralds", "Sapphires"]])
+    
+    context "left-right" do
+      context "@list has item(s)" do
+        grid = create_auto_left_right("Rubys Crystals Emeralds Sapphires a b")
+        
+        it "canvas_lr should not empty" do
+          grid.canvas_lr.should eq([["Rubys", "Crystals"], ["Emeralds", "Sapphires"], ["a", "b"]])
         end
-
-        it "2nd condition" do
-          grid.virtual_generate(17)
-          grid.col_height.should eq([4])
-          grid.col_width.should eq([9])
-          grid.virtual_to_canvas
-          grid.canvas.should eq([["Rubys", "Crystals", "Emeralds", "Sapphires"]])
-        end
-
-        it "3rd condition" do
-          grid.virtual_generate(35)
-          grid.col_height.should eq([1, 1, 1, 1])
-          grid.col_width.should eq([5, 8, 8, 9])
-          grid.virtual_to_canvas
-          grid.canvas.should eq([["Rubys"], ["Crystals"], ["Emeralds"], ["Sapphires"]])
+        
+        it "canvas_td should empty" do
+          grid.canvas_td.empty?.should be_true
         end
       end
-
-      context "2nd correctness check" do
-        grid = create_virtual_generate("a b c d e f g h i j k l m")
-
-        it "1st condition" do
-          grid.virtual_generate(100)
-          grid.col_height.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
-          grid.col_width.should eq([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
-          grid.virtual_to_canvas
-          grid.canvas.should eq([["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"], ["i"], ["j"], ["k"], ["l"], ["m"]])
+      
+      context "with custom separator" do
+        grid = create_auto_left_right_with_custom_sep("Rubys Crystals Emeralds Sapphires a b", " | ")
+        
+        it "canvas_lr should be one column" do
+          grid.auto(18, false)
+          grid.canvas_lr.should eq([["Rubys"], ["Crystals"], ["Emeralds"], ["Sapphires"], ["a"], ["b"]])
         end
-
-        it "2nd condition" do
-          grid.virtual_generate(0)
-          grid.col_height.should eq([13])
-          grid.col_width.should eq([1])
-          grid.virtual_to_canvas
-          grid.canvas.should eq([["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]])
+        
+        it "canvas_lr should be 2 : 2 : 2" do
+          grid.auto(20, false)
+          grid.canvas_lr.should eq([["Rubys", "Crystals"], ["Emeralds", "Sapphires"], ["a", "b"]])
         end
-
-        it "3rd condition" do
-          grid.virtual_generate(3)
-          grid.col_height.should eq([7, 6])
-          grid.col_width.should eq([1, 1])
-          grid.virtual_to_canvas
-          grid.canvas.should eq([["a", "b", "c", "d", "e", "f", "g"], ["h", "i", "j", "k", "l", "m"]])
+        
+        it "canvas_td should empty" do
+          grid.canvas_td.empty?.should be_true
         end
       end
-    end
-
-    context "@list has no item" do
-      grid = Grid.new("")
-      grid.virtual_generate
-      grid.virtual_to_canvas
-
-      it "@canvas should be still empty" do
-        grid.canvas.empty?.should eq(true)
-      end
-
-      it "@col_height should have any" do
-        grid.col_height.empty?.should eq(true)
-      end
-
-      it "@col_width should have any" do
-        grid.col_width.empty?.should eq(true)
-      end
-    end
-
-    context "@list has item, but virtual_generate has not been called" do
-      grid = Grid.new("Rubys Crystals Emeralds Sapphires")
-      grid.virtual_to_canvas
-
-      it "@canvas should be one column" do
-        grid.canvas.empty?.should eq(false)
-        grid.canvas.should eq([["Rubys"], ["Crystals"], ["Emeralds"], ["Sapphires"]])
-      end
-
-      it "@col_height should have any" do
-        grid.col_height.empty?.should eq(true)
-      end
-
-      it "@col_width should have any" do
-        grid.col_width.empty?.should eq(true)
+      
+      it "@list has no item(s)" do
+        grid = create_auto_left_right("")
+        grid.canvas_lr.should eq([] of Array(String))
       end
     end
   end
 
   describe ".to_s" do
     context "top-down" do
-      str_left = create_to_string("Rubys Crystals Emeralds Sapphires", true, true, ' ')
-
+      grid = create_auto_top_down("Rubys Crystals Emeralds Sapphires")
+      
       it "should return type of String" do
-        typeof(str_left).should eq(String)
+        str = grid.to_s(true)
+        typeof(str).should eq(String)
       end
 
       it "should ok with align_left" do
-        str_left.should eq("Rubys    Emeralds \nCrystals Sapphires\n")
+        str = grid.to_s(true, true)
+        str.should eq("Rubys    Emeralds \nCrystals Sapphires\n")
       end
-
-      str_left_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", true, true, '-')
 
       it "should ok with align_left with custom delimiter '-'" do
-        str_left_delimiter.should eq("Rubys   -Emeralds \nCrystals-Sapphires\n")
+        str = grid.to_s(true, true, "-")
+        str.should eq("Rubys   -Emeralds \nCrystals-Sapphires\n")
       end
-
-      str_right = create_to_string("Rubys Crystals Emeralds Sapphires", true, false, ' ')
 
       it "should ok with align_right" do
-        str_right.should eq("   Rubys  Emeralds\nCrystals Sapphires\n")
+        str = grid.to_s(true, false)
+        str.should eq("   Rubys  Emeralds\nCrystals Sapphires\n")
       end
-
-      str_right_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", true, false, '-')
 
       it "should ok with align_right with custom delimiter '-'" do
-        str_right_delimiter.should eq("   Rubys- Emeralds\nCrystals-Sapphires\n")
+        str = grid.to_s(true, false, "-")
+        str.should eq("   Rubys- Emeralds\nCrystals-Sapphires\n")
       end
 
-      str_empty = create_to_string("", true)
-
       it "should return empty string if the canvas is empty" do
-        str_empty.should eq("")
+        grid = Grid.new
+        grid.auto(top_down: true)
+        str = grid.to_s(true)
+        str.should eq("")
       end
     end
-
+    
     context "left-right" do
-      str_left_lr = create_to_string("Rubys Crystals Emeralds Sapphires", false, true, ' ')
-
+      grid = create_auto_left_right("Rubys Crystals Emeralds Sapphires")
+      
       it "should return type of String" do
-        typeof(str_left_lr).should eq(String)
+        str = grid.to_s(false)
+        typeof(str).should eq(String)
       end
 
       it "should ok with align_left" do
-        str_left_lr.should eq("Rubys    Crystals \nEmeralds Sapphires\n")
+        str = grid.to_s(false, true)
+        str.should eq("Rubys    Crystals \nEmeralds Sapphires\n")
       end
-
-      str_left_lr_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", false, true, '-')
 
       it "should ok with align_left with custom delimiter '-'" do
-        str_left_lr_delimiter.should eq("Rubys   -Crystals \nEmeralds-Sapphires\n")
+        str = grid.to_s(false, true, "-")
+        str.should eq("Rubys   -Crystals \nEmeralds-Sapphires\n")
       end
-
-      str_right_lr = create_to_string("Rubys Crystals Emeralds Sapphires", false, false, ' ')
 
       it "should ok with align_right" do
-        str_right_lr.should eq("   Rubys  Crystals\nEmeralds Sapphires\n")
+        str = grid.to_s(false, false)
+        str.should eq("   Rubys  Crystals\nEmeralds Sapphires\n")
       end
-
-      str_right_lr_delimiter = create_to_string("Rubys Crystals Emeralds Sapphires", false, false, '-')
 
       it "should ok with align_right with custom delimiter '-'" do
-        str_right_lr_delimiter.should eq("   Rubys- Crystals\nEmeralds-Sapphires\n")
+        str = grid.to_s(false, false, "-")
+        str.should eq("   Rubys- Crystals\nEmeralds-Sapphires\n")
       end
 
-      str_empty_lr = create_to_string("", false)
-
       it "should return empty string if the canvas is empty" do
-        str_empty_lr.should eq("")
+        grid = Grid.new
+        grid.auto(top_down: false)
+        str = grid.to_s(false)
+        str.should eq("")
       end
     end
   end
 
-  describe ".virtual_one_column_lr" do
-    grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
-    grid.virtual_one_column_lr
-
-    it "non empty @list, @col_width_lr should have size of 1" do
-      grid.col_width_lr.size.should eq(1)
+  describe ".one_column" do
+    ary = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
+    grid = Grid.new(ary)
+    grid_empty = Grid.new
+    
+    context "top-down" do
+      grid.one_column_td
+  
+      it "non empty @list, @col_width_td should have size of 1" do
+        grid.col_width_td.size.should eq(1)
+      end
+      
+      it "non empty @list, @canvas_td should one column" do
+        grid.canvas_td.size.should eq(1)
+        grid.canvas_td.should eq([["str_1", "str_30", "str_200", "str_4000", "str_50000"]])
+      end
+      
+      it "non empty @list, @col_width_td.first should have size of largest str" do
+        grid.col_width_td.first.should eq(ary.max_of?(&.size))
+      end
+      
+      it "empty @list, @col_width_td should have size of 0" do
+        grid_empty.col_width_td.size.should eq(0)
+      end
     end
-
-    grid_empty = create_virtual_generate("")
-    grid_empty.virtual_one_column_lr
-
-    it "empty @list, @col_width_lr should have size of 0" do
-      grid_empty.col_width_lr.size.should eq(0)
+    
+    context "left-right" do
+      grid.one_column_lr
+  
+      it "non empty @list, @col_width_lr should have size of 1" do
+        grid.col_width_lr.size.should eq(1)
+      end
+      
+      it "non empty @list, @canvas_lr should one column" do
+        grid.canvas_lr.size.should eq(ary.size)
+        grid.canvas_lr.each { |s| s.size.should eq(1) }
+        grid.canvas_lr.should eq([["str_1"], ["str_30"], ["str_200"], ["str_4000"], ["str_50000"]])
+      end
+      
+      it "non empty @list, @col_width_lr.first should have size of largest str" do
+        grid.col_width_lr.first.should eq(ary.max_of?(&.size))
+      end
+  
+      it "empty @list, @col_width_lr should have size of 0" do
+        grid_empty.col_width_lr.size.should eq(0)
+      end
     end
   end
 
   describe ".virtual_column_width_lr" do
-    grid = create_virtual_generate("Rubys Crystals Emeralds Sapphires")
+    ary = ["str_1", "str_30", "str_200", "str_4000", "str_50000"]
+    grid = Grid.new(ary)
+    grid_empty = Grid.new
 
-    it "should pass 1st test" do
-      grid.virtual_column_width_lr(1).should eq([9])
+    context "top-down" do
+      it "should pass 1st test" do
+        grid.virtual_column_width_td(1).should eq([5, 6, 7, 8, 9])
+      end
+      
+      it "should pass 2nd test" do
+        grid.virtual_column_width_td(2).should eq([6, 8, 9])
+      end
+      
+      it "should pass 3rd test" do
+        grid.virtual_column_width_td(3).should eq([7, 9])
+      end
+      
+      it "should pass 4th test" do
+        grid.virtual_column_width_td(4).should eq([8, 9])
+      end
+      
+      it "should pass 5th test" do
+        grid.virtual_column_width_td(5).should eq([9])
+      end
+      
+      it "should pass empty list" do
+        grid_empty.virtual_column_width_td(1).should eq([] of Int32)
+      end
     end
-    it "should pass 2nd test" do
-      grid.virtual_column_width_lr(2).should eq([8, 9])
-    end
-    it "should pass 3rd test" do
-      grid.virtual_column_width_lr(3).should eq([9, 8, 8])
-    end
-    it "should pass 4th test" do
-      grid.virtual_column_width_lr(4).should eq([5, 8, 8, 9])
+
+    context "left-right" do
+      it "should pass 1st test" do
+        grid.virtual_column_width_lr(1).should eq([9])
+      end
+      
+      it "should pass 2nd test" do
+        grid.virtual_column_width_lr(2).should eq([9, 8])
+      end
+      
+      it "should pass 3rd test" do
+        grid.virtual_column_width_lr(3).should eq([8, 9, 7])
+      end
+      
+      it "should pass 4th test" do
+        grid.virtual_column_width_lr(4).should eq([9, 6, 7, 8])
+      end
+      
+      it "should pass 5th test" do
+        grid.virtual_column_width_lr(5).should eq([5, 6, 7, 8, 9])
+      end
+      
+      it "should pass empty list" do
+        grid_empty.virtual_column_width_lr(1).should eq([] of Int32)
+      end
     end
   end
 end

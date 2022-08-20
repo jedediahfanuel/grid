@@ -11,7 +11,7 @@ module LeftRight
   # # Emeralds Sapphires
   # # a        b  
   # ```
-  property canvas_lr = [] of Array(String)
+  property canvas_lr : Array(Array(String)) = [] of Array(String)
 
   # Holds curently max width for every column.
   #
@@ -24,7 +24,29 @@ module LeftRight
   # # => 2nd column width is 7 char
   # # => 3rd column width is 9 char
   # ```
-  property col_width_lr = [] of Int32
+  property col_width_lr : Array(Int32) = [] of Int32
+
+  # Return canvas with the size of one column.
+  # Its set @canvas_lr and calculate the @col_width_lr
+  #
+  # Example:
+  # ```
+  # @list = [
+  #   "str_1",
+  #   "str_30",
+  #   "str_200",
+  #   "str_4000",
+  #   "str_50000",
+  # ]
+  # one_column_lr # => [["str_1"], ["str_30"], ["str_200"], ["str_4000"], ["str_50000"]]
+  # ```
+  def one_column_lr : Array(Array(String))
+    cw = @list.max_of?(&.size)
+    @col_width_lr = cw ? [cw] : @col_width_lr.clear
+
+    @canvas_lr.clear
+    @canvas_lr = @list.map { |row| [row] }
+  end
 
   # Calculate each column width for canvas with virtually row item of *row_size*.
   #
@@ -53,6 +75,8 @@ module LeftRight
   # # str_50000
   # ```
   def virtual_column_width_lr(row_size : Int32) : Array(Int32)
+    return [] of Int32 if @list.empty?
+    
     ary = @list.each_slice(row_size).reduce(Array(Int32).new(row_size, 0)) do |memo, row|
       memo.map_with_index do |n, i|
         row[i]? ? row[i].size > n ? row[i].size : n : n
@@ -60,28 +84,6 @@ module LeftRight
     end
 
     return ary
-  end
-
-  # Return canvas with the size of one column.
-  # Its set @canvas_lr and calculate the @col_width_lr
-  #
-  # Example:
-  # ```
-  # @list = [
-  #   "str_1",
-  #   "str_30",
-  #   "str_200",
-  #   "str_4000",
-  #   "str_50000",
-  # ]
-  # virtual_one_column_lr # => [["str_1"], ["str_30"], ["str_200"], ["str_4000"], ["str_50000"]]
-  # ```
-  def virtual_one_column_lr : Array(Array(String))
-    cw = @list.max_of?(&.size)
-    @col_width_lr = cw ? [cw] : @col_width_lr.clear
-
-    @canvas_lr.clear
-    @canvas_lr = @list.map { |row| [row] }
   end
 
   private def virtual_left_right : Array(Array(String))
@@ -94,7 +96,7 @@ module LeftRight
     end
 
     if col_count < 2
-      return virtual_one_column_lr
+      return one_column_lr
     end
 
     final_cols_width = col_count.downto(2).each do |c|
@@ -103,7 +105,7 @@ module LeftRight
     end
 
     unless final_cols_width
-      return virtual_one_column_lr
+      return one_column_lr
     end
 
     @col_width_lr = final_cols_width
