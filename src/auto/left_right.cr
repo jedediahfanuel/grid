@@ -1,7 +1,7 @@
 module LeftRight
   # Canvas is a variable that holds the cell of each string in grid format.
   # In @canvas_ld, each element in the array is representing a row.
-  # 
+  #
   # Example:
   # ```
   # @canvas_lr = [["Rubys", "Crystals"], ["Emeralds", "Sapphires"], ["a", "b"]]
@@ -64,7 +64,7 @@ module LeftRight
 
   # Return canvas with the size of one column.
   # Its set @canvas_lr and calculate the @col_width_lr
-  # 
+  #
   # Example:
   # ```
   # @list = [
@@ -90,7 +90,7 @@ module LeftRight
 
     @list.each_with_index do |str, i|
       temp_size += str.size
-      break col_count = (i + 1) if (temp_size + delimiter_count_of(i + 1)) >= @max_width
+      break col_count = (i + 1) if (temp_size + (delimiter_count_of(i + 1) * @separator.size)) >= @max_width
     end
 
     if col_count < 2
@@ -99,7 +99,7 @@ module LeftRight
 
     final_cols_width = col_count.downto(2).each do |c|
       candidate_cols_width = virtual_column_width_lr(c)
-      break candidate_cols_width if (candidate_cols_width.sum(0) + delimiter_count_of(c)) <= @max_width
+      break candidate_cols_width if (candidate_cols_width.sum(0) + (delimiter_count_of(c) * @separator.size)) <= @max_width
     end
 
     unless final_cols_width
