@@ -33,7 +33,7 @@ struct Grid
   # Holds the max width of the canvas.
   # Its defined by the user.
   # Default value is `24`.
-  property max_width = 0
+  property max_width :  Int32 = 0
 
   # Holds the list of String from the user.
   #
@@ -46,7 +46,7 @@ struct Grid
   
   # Holds the separator specified by the user.
   # Default " " (a single space)
-  getter separator = " "
+  getter separator : String = " "
   
   # Set the list from a string.
   #
@@ -79,7 +79,7 @@ struct Grid
   # grid = Grid.new() # produce empty string
   # grid = Grid.new(["Ruby", "Crystal", "Emerald", "Sapphire"], " | ") # with custom separator
   # ```
-  def initialize(@list : Array(String), @separator = " ")
+  def initialize(@list : Array(String), @separator : String = " ")
   end
 
   # Initialize grid *list* with type of `String` as a input parameter.
@@ -90,7 +90,7 @@ struct Grid
   # grid = Grid.new() # produce empty list
   # grid = Grid.new("Ruby Crystal Emerald Sapphire", " | ") # with custom separator
   # ```
-  def initialize(str = "", @separator = " ")
+  def initialize(str : String = "", @separator : String = " ")
     @list = str.strip.split
   end
 
@@ -122,7 +122,7 @@ struct Grid
   # grid.auto(18, false) # generate left-right grid with 18 char as max canvas width
   # # => [["Rubys", "Crystals"], ["Emeralds", "Sapphires"], ["a", "b"]]
   # ```
-  def auto(max_w = 24, top_down = true)
+  def auto(max_w : Int32 = 24, top_down : Bool = true)
     @max_width = max_w
     top_down ? virtual_top_down : virtual_left_right
   end
@@ -182,7 +182,7 @@ struct Grid
   # # Crystals...        a
   # # Emeralds...        b
   # ```
-  def to_s(top_down = true, align_left = true, sep = @separator) : String
+  def to_s(top_down : Bool = true, align_left : Bool = true, sep : String = @separator) : String
     sep = sep[0..(@separator.size-1)] if @separator.size < sep.size
     String.build do |io|
       if top_down
