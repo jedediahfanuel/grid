@@ -42,7 +42,7 @@ grid.to_s(true, false) # get the string format (true) in top-down direction
 
 ```
 
-For detailed api, check [grid docs](https://jeddi212.github.io/grid/).
+For detailed api, check [grid docs](https://jeddi212.github.io/grid-docs/).
 
 ## Development
 
